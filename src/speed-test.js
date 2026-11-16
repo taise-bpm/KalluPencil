@@ -38,16 +38,23 @@ export const MALAYALAM_SPEED_PASSAGES = [
 ];
 
 export class SpeedTestSession {
-  constructor(durationMinutes = 1) {
+  constructor(durationMinutes = 1, customText = '') {
     this.durationSeconds = durationMinutes * 60;
     this.remainingSeconds = this.durationSeconds;
     this.timerInterval = null;
     this.isActive = false;
     this.isCompleted = false;
 
-    // Pick random passage
-    const randomIndex = Math.floor(Math.random() * MALAYALAM_SPEED_PASSAGES.length);
-    this.passageData = MALAYALAM_SPEED_PASSAGES[randomIndex];
+    if (customText && customText.trim().length > 10) {
+      this.passageData = {
+        id: 'custom',
+        title: 'കസ്റ്റം പാഠം (Custom Passage)',
+        text: customText.trim()
+      };
+    } else {
+      const randomIndex = Math.floor(Math.random() * MALAYALAM_SPEED_PASSAGES.length);
+      this.passageData = MALAYALAM_SPEED_PASSAGES[randomIndex];
+    }
     this.words = this.passageData.text.split(/\s+/).filter(Boolean);
 
     this.currentWordIndex = 0;

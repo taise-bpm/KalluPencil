@@ -7,6 +7,57 @@
 import { TUTOR_LEVELS, FINGER_NAMES, KEY_FINGER_MAP } from './tutor-curriculum.js';
 import { INSCRIPT_MAP } from './inscript-data.js';
 
+export const CHILLU_MAP = {
+  'ർ': {
+    name: 'ചില്ല് ർ',
+    keys: [
+      { char: 'ര', code: 'KeyJ', shift: false },
+      { char: '്', code: 'KeyD', shift: false },
+      { char: '\u200D', code: 'BracketRight', shift: false }
+    ]
+  },
+  'ൽ': {
+    name: 'ചില്ല് ൽ',
+    keys: [
+      { char: 'ല', code: 'KeyN', shift: false },
+      { char: '്', code: 'KeyD', shift: false },
+      { char: '\u200D', code: 'BracketRight', shift: false }
+    ]
+  },
+  'ൾ': {
+    name: 'ചില്ല് ൾ',
+    keys: [
+      { char: 'ള', code: 'KeyN', shift: true },
+      { char: '്', code: 'KeyD', shift: false },
+      { char: '\u200D', code: 'BracketRight', shift: false }
+    ]
+  },
+  'ൻ': {
+    name: 'ചില്ല് ൻ',
+    keys: [
+      { char: 'ന', code: 'KeyV', shift: false },
+      { char: '്', code: 'KeyD', shift: false },
+      { char: '\u200D', code: 'BracketRight', shift: false }
+    ]
+  },
+  'ൺ': {
+    name: 'ചില്ല് ൺ',
+    keys: [
+      { char: 'ണ', code: 'KeyC', shift: true },
+      { char: '്', code: 'KeyD', shift: false },
+      { char: '\u200D', code: 'BracketRight', shift: false }
+    ]
+  },
+  'ൿ': {
+    name: 'ചില്ല് ൿ',
+    keys: [
+      { char: 'ക', code: 'KeyK', shift: false },
+      { char: '്', code: 'KeyD', shift: false },
+      { char: '\u200D', code: 'BracketRight', shift: false }
+    ]
+  }
+};
+
 export class TutorEngine {
   constructor(options = {}) {
     this.storageKey = 'ml_tutor_progress';
@@ -16,6 +67,7 @@ export class TutorEngine {
     this.currentStage = null;
     this.targetText = '';
     this.currentIndex = 0;
+    this.chilluSubStep = 0;
 
     this.correctCount = 0;
     this.errorCount = 0;
@@ -96,6 +148,7 @@ export class TutorEngine {
 
   resetStats() {
     this.currentIndex = 0;
+    this.chilluSubStep = 0;
     this.correctCount = 0;
     this.errorCount = 0;
     this.startTime = null;
@@ -119,6 +172,31 @@ export class TutorEngine {
     const char = this.getCurrentChar();
     if (!char) return null;
 
+    // Check if this character is an atomic Chillu that requires sub-step sequence
+    if (CHILLU_MAP[char]) {
+      const chillu = CHILLU_MAP[char];
+      const stepIdx = this.chilluSubStep || 0;
+      const stepKey = chillu.keys[stepIdx] || chillu.keys[0];
+      const info = this.charToKeyInfo.get(stepKey.char);
+      const finger = (info && info.finger) || KEY_FINGER_MAP[stepKey.code] || 'RI';
+      const fingerObj = FINGER_NAMES[finger] || FINGER_NAMES.RI;
+      const keyLabel = stepKey.char === '\u200D' ? '] (ZWJ)' : (info?.keyName || stepKey.code);
+
+      return {
+        char,
+        subChar: stepKey.char,
+        code: stepKey.code,
+        keyName: keyLabel,
+        shift: stepKey.shift || false,
+        fingerCode: finger,
+        fingerMl: fingerObj.ml,
+        fingerEn: fingerObj.en,
+        fingerColor: fingerObj.color,
+        stepTitle: `${chillu.name} (സ്റ്റെപ്പ് ${stepIdx + 1}/3: ${stepKey.char === '\u200D' ? 'ZWJ' : stepKey.char})`,
+        isChillu: true
+      };
+    }
+
     const info = this.charToKeyInfo.get(char);
     if (!info) {
       return {
@@ -128,7 +206,9 @@ export class TutorEngine {
         shift: false,
         fingerCode: 'RT',
         fingerMl: 'തള്ളവിരൽ',
-        fingerEn: 'Thumb'
+        fingerEn: 'Thumb',
+        fingerColor: '#64748b',
+        stepTitle: `അക്ഷരം: ${char}`
       };
     }
 
@@ -142,7 +222,26 @@ export class TutorEngine {
       fingerCode: info.finger,
       fingerMl: fingerObj.ml,
       fingerEn: fingerObj.en,
-      fingerColor: fingerObj.color
+      fingerColor: fingerObj.color,
+      stepTitle: `അക്ഷരം: ${char}`
+    };
+  }
+
+  completeOrAdvance() {
+    const isCompleted = this.currentIndex >= this.targetText.length;
+    if (isCompleted) {
+      this.endTime = Date.now();
+      this.isActive = false;
+      const finalMetrics = this.getMetrics();
+      this.saveStageProgress(this.currentStage.id, finalMetrics);
+      this.onStageComplete(this.currentStage, finalMetrics);
+    }
+
+    this.notify();
+    return {
+      correct: true,
+      finished: isCompleted,
+      nextGuide: this.getCurrentKeyGuide()
     };
   }
 
@@ -154,25 +253,56 @@ export class TutorEngine {
     const expected = this.getCurrentChar();
     if (!expected) return { finished: true };
 
+    // Handle Chillu Characters
+    if (CHILLU_MAP[expected]) {
+      // 1. Direct atomic chillu match (e.g. from Virtual Keyboard direct chillu button)
+      if (typedChar === expected) {
+        this.correctCount++;
+        this.currentIndex++;
+        this.chilluSubStep = 0;
+        return this.completeOrAdvance();
+      }
+
+      // 2. Step-by-step keystrokes (e.g. ര -> ് -> ZWJ)
+      const chillu = CHILLU_MAP[expected];
+      const currentSubKey = chillu.keys[this.chilluSubStep || 0];
+
+      if (typedChar === currentSubKey.char) {
+        this.chilluSubStep = (this.chilluSubStep || 0) + 1;
+
+        if (this.chilluSubStep >= chillu.keys.length) {
+          // All 3 sub-keystrokes completed! Chillu fully formed!
+          this.correctCount++;
+          this.currentIndex++;
+          this.chilluSubStep = 0;
+          return this.completeOrAdvance();
+        } else {
+          // Advance to next sub-step (e.g. ് or ZWJ)
+          this.notify();
+          return {
+            correct: true,
+            finished: false,
+            nextGuide: this.getCurrentKeyGuide()
+          };
+        }
+      } else {
+        // Wrong keystroke for this sub-step
+        this.errorCount++;
+        this.notify();
+        return {
+          correct: false,
+          finished: false,
+          nextGuide: this.getCurrentKeyGuide()
+        };
+      }
+    }
+
+    // Normal single-keystroke characters
     if (typedChar === expected) {
       this.correctCount++;
       this.currentIndex++;
-
-      const isCompleted = this.currentIndex >= this.targetText.length;
-      if (isCompleted) {
-        this.endTime = Date.now();
-        this.isActive = false;
-        const finalMetrics = this.getMetrics();
-        this.saveStageProgress(this.currentStage.id, finalMetrics);
-        this.onStageComplete(this.currentStage, finalMetrics);
-      }
-
-      this.notify();
-      return {
-        correct: true,
-        finished: isCompleted,
-        nextGuide: this.getCurrentKeyGuide()
-      };
+      this.chilluSubStep = 0;
+      return this.completeOrAdvance();
     } else {
       this.errorCount++;
       this.notify();
@@ -185,9 +315,17 @@ export class TutorEngine {
   }
 
   backspace() {
-    if (!this.isActive || this.currentIndex <= 0) return;
-    this.currentIndex--;
-    this.notify();
+    if (!this.isActive) return;
+    if (this.chilluSubStep > 0) {
+      this.chilluSubStep--;
+      this.notify();
+      return;
+    }
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.chilluSubStep = 0;
+      this.notify();
+    }
   }
 
   getMetrics() {

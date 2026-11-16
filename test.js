@@ -145,6 +145,21 @@ import('./src/speed-test.js').then(({ SpeedTestSession, MALAYALAM_SPEED_PASSAGES
     assert.strictEqual(res2.correct, false, 'Non-matching input should be recorded as error');
     assert.strictEqual(tutor.errorCount, 1, 'Error count should be 1');
 
+    // Test Chillu step-by-step resolution in Stage 5-1
+    tutor.loadStage('5-1');
+    assert.strictEqual(tutor.getCurrentChar(), 'ർ', 'Stage 5-1 starts with chillu ർ');
+    const cg1 = tutor.getCurrentKeyGuide();
+    assert.strictEqual(cg1.code, 'KeyJ', 'Chillu step 1 should guide to KeyJ (ര)');
+    assert.strictEqual(cg1.fingerCode, 'RI', 'Chillu step 1 should guide to Right Index');
+    tutor.processKeyInput('ര');
+    const cg2 = tutor.getCurrentKeyGuide();
+    assert.strictEqual(cg2.code, 'KeyD', 'Chillu step 2 should guide to KeyD (്)');
+    tutor.processKeyInput('്');
+    const cg3 = tutor.getCurrentKeyGuide();
+    assert.strictEqual(cg3.code, 'BracketRight', 'Chillu step 3 should guide to ZWJ');
+    tutor.processKeyInput('\u200D');
+    assert.strictEqual(tutor.currentIndex, 1, 'Chillu ർ completed and advanced to index 1');
+
     console.log('✓ InScript Master Tutor Engine verified successfully.');
 
     // 6. Verify Production bundle.js Syntax & Evaluation
