@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ml" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="Professional Malayalam InScript typing interface with Unicode ligature support for mobile, tablet, and desktop." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് (Malayalam InScript Typing)</title>
+
+  <!-- Google Fonts: Top Malayalam OpenType Webfonts for pristine ligatures -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Gayathri:wght@400;700&family=Manjari:wght@400;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Main Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">മ</div>
+        <div>
+          <h1>മലയാളം ടൈപ്പിംഗ് <span class="sub-badge">InScript Pro</span></h1>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Input Mode Selector -->
+        <div class="select-wrapper" title="ഇൻപുട്ട് രീതി തിരഞ്ഞെടുക്കുക">
+          <select id="inputModeSelect" class="app-select" aria-label="Input Mode">
+            <option value="touch">📱 ടച്ച് കീബോർഡ് (Mobile / Tab)</option>
+            <option value="physical">💻 ഫിസിക്കൽ കീബോർഡ് (Desktop)</option>
+            <option value="manglish">🔤 മംഗ്ലീഷ് (Phonetic / Mozhi)</option>
+            <option value="system">⌨️ സിസ്റ്റം കീബോർഡ് (Gboard / Native)</option>
+          </select>
+        </div>
+
+        <!-- Voice Typing Button -->
+        <button type="button" id="voiceBtn" class="btn btn-voice" title="സംസാരിച്ച് ടൈപ്പ് ചെയ്യുക (Malayalam Voice Typing)">
+          <span class="icon">🎙️</span> <span>വോയ്‌സ്</span>
+        </button>
+
+        <!-- Speed Test Button -->
+        <button type="button" id="speedTestBtn" class="btn btn-speed" title="മലയാളം ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് (1-5 മിനിറ്റ്)">
+          <span class="icon">⚡</span> <span>സ്പീഡ് ടെസ്റ്റ്</span>
+        </button>
+
+        <!-- Typing Practice Tutor Button -->
+        <button type="button" id="practiceBtn" class="btn" title="ടൈപ്പിംഗ് പരിശീലനം (Typing Tutor)">
+          <span class="icon">🎯</span> <span>പരിശീലനം</span>
+        </button>
+
+        <!-- Help Guide Button -->
+        <button type="button" id="helpBtn" class="btn btn-icon-only" title="കീബോർഡ് സഹായി (InScript Guide)">
+          <span class="icon">ℹ️</span>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button type="button" id="themeToggleBtn" class="btn" title="തീം മാറ്റുക">
+          <span class="icon">☀️</span> <span>ലൈറ്റ് മോഡ്</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Editor Section -->
+    <main class="editor-section">
+      <!-- Toolbar Controls -->
+      <div class="editor-toolbar">
+        <div class="toolbar-group">
+          <!-- Undo / Redo -->
+          <button type="button" id="undoBtn" class="btn btn-icon-only" title="Undo (Ctrl+Z)" disabled>
+            <span>↩</span>
+          </button>
+          <button type="button" id="redoBtn" class="btn btn-icon-only" title="Redo (Ctrl+Y)" disabled>
+            <span>↪</span>
+          </button>
+
+          <!-- Font Family Selector -->
+          <select id="fontFamilySelect" class="app-select" title="ഫോണ്ട് തിരഞ്ഞെടുക്കുക">
+            <option value="'Manjari', sans-serif">Manjari (മഞ്ജരി)</option>
+            <option value="'Noto Sans Malayalam', sans-serif">Noto Sans Malayalam</option>
+            <option value="'Gayathri', sans-serif">Gayathri (ഗായത്രി)</option>
+            <option value="'Chilanka', cursive">Chilanka (ചിലങ്ക)</option>
+            <option value="system-ui, sans-serif">System Default</option>
+          </select>
+
+          <!-- Font Size Slider -->
+          <div class="slider-wrapper" title="അക്ഷരങ്ങളുടെ വലിപ്പം">
+            <span>വലിപ്പം:</span>
+            <input type="range" id="fontSizeSlider" min="16" max="38" value="22" step="2" />
+            <span id="fontSizeDisplay">22px</span>
+          </div>
+        </div>
+
+        <div class="toolbar-group">
+          <!-- Primary Actions -->
+          <button type="button" id="copyBtn" class="btn btn-primary" title="ക്ലിപ്പ്ബോർഡിലേക്ക് കോപ്പി ചെയ്യുക">
+            <span>📋 കോപ്പി (Copy)</span>
+          </button>
+
+          <button type="button" id="downloadTxtBtn" class="btn" title="ടെക്സ്റ്റ് ഫയലായി സൂക്ഷിക്കുക">
+            <span>💾 .TXT</span>
+          </button>
+
+          <button type="button" id="downloadDocBtn" class="btn" title="വേഡ് ഡോക്യുമെന്റായി സൂക്ഷിക്കുക">
+            <span>📄 .DOC</span>
+          </button>
+
+          <button type="button" id="shareBtn" class="btn btn-icon-only" title="പങ്കുവെക്കുക (Share)">
+            <span>↗</span>
+          </button>
+
+          <button type="button" id="printBtn" class="btn btn-icon-only" title="പ്രിന്റ് ചെയ്യുക / Save as PDF">
+            <span>🖨️</span>
+          </button>
+
+          <button type="button" id="normalizeBtn" class="btn btn-icon-only" title="യൂണികോഡ് ചില്ലുകൾ ക്രമീകരിക്കുക (Normalize Unicode)">
+            <span>✨</span>
+          </button>
+
+          <button type="button" id="clearBtn" class="btn btn-icon-only" title="എല്ലാം മായ്ക്കുക (Clear)">
+            <span>🗑</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor Textarea with pristine Unicode rendering -->
+      <div class="textarea-container">
+        <textarea
+          id="mlEditor"
+          class="ml-textarea"
+          placeholder="ഇവിടെ മലയാളത്തിൽ ടൈപ്പ് ചെയ്യുക... (Type Malayalam here using InScript)"
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+          rows="5"
+        ></textarea>
+      </div>
+
+      <!-- Live Stats & Options Bar -->
+      <footer class="editor-stats-bar">
+        <div class="stats-badges">
+          <span class="stat-item">വാക്കുകൾ: <strong id="wordCount">0</strong></span>
+          <span class="stat-item">അക്ഷരങ്ങൾ: <strong id="aksharamCount">0</strong></span>
+          <span class="stat-item">ക്യാരക്ടർ: <strong id="charCount">0</strong></span>
+        </div>
+
+        <div class="toggle-group">
+          <select id="kbSizeSelect" class="app-select" title="കീബോർഡ് വലിപ്പം (Keyboard Size)">
+            <option value="normal">കീബോർഡ്: സാധാരണ</option>
+            <option value="compact">കീബോർഡ്: ചെറുത്</option>
+            <option value="large">കീബോർഡ്: വലുത്</option>
+          </select>
+          <label class="checkbox-label" title="കീ ശബ്ദം ഓൺ/ഓഫ് ചെയ്യുക">
+            <input type="checkbox" id="soundToggle" />
+            <span>ശബ്ദം (Sound)</span>
+          </label>
+          <label class="checkbox-label" title="ടച്ച് വൈബ്രേഷൻ ഓൺ/ഓഫ് ചെയ്യുക">
+            <input type="checkbox" id="hapticToggle" checked />
+            <span>വൈബ്രേഷൻ (Haptic)</span>
+          </label>
+          <button type="button" id="toggleKbBtn" class="btn btn-icon-only" title="കീബോർഡ് മറയ്ക്കുക/കാണിക്കുക">
+            <span class="icon">▼</span>
+          </button>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Virtual InScript Keyboard Section -->
+    <section id="virtualKeyboard" class="keyboard-section">
+      <!-- Dynamic Keyboard Content Injected by virtual-keyboard.js -->
+    </section>
+  </div>
+
+  <!-- InScript Layout & Shortcut Guide Modal -->
+  <div id="helpModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>ഇൻസ്ക്രിപ്റ്റ് കീബോർഡ് സഹായി (InScript Typing Guide)</h2>
+        <button type="button" id="closeHelpBtn" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>ഇൻസ്ക്രിപ്റ്റ് (InScript)</strong> ഭാരത സർക്കാർ അംഗീകരിച്ച ഔദ്യോഗിക മലയാളം ടൈപ്പിംഗ് രീതിയാണ്. ഇതിന്റെ അടിസ്ഥാന നിയമങ്ങൾ താഴെ നൽകുന്നു:</p>
+
+        <h3>1. സ്വരങ്ങളും സ്വരചിഹ്നങ്ങളും (Vowels & Matras)</h3>
+        <p>ഇടതു കൈയിലെ കീകൾ സാധാരണയായി സ്വരചിഹ്നങ്ങൾക്കും (Matras), <strong>Shift</strong> അമർത്തുമ്പോൾ സ്വതന്ത്ര സ്വരങ്ങൾക്കുമായി (അ, ആ, ഇ...) ക്രമീകരിച്ചിരിക്കുന്നു.</p>
+        <table>
+          <thead>
+            <tr><th>ഇംഗ്ലീഷ് കീ</th><th>സാധാരണ (Normal)</th><th>Shift + കീ</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>D</strong></td><td>് (ചന്ദ്രക്കല / Virama)</td><td>അ (A)</td></tr>
+            <tr><td><strong>E</strong></td><td>ാ (Aa matra)</td><td>ആ (AA)</td></tr>
+            <tr><td><strong>F</strong></td><td>ി (I matra)</td><td>ഇ (I)</td></tr>
+            <tr><td><strong>R</strong></td><td>ീ (Ii matra)</td><td>ഈ (II)</td></tr>
+            <tr><td><strong>G</strong></td><td>ു (U matra)</td><td>ഉ (U)</td></tr>
+            <tr><td><strong>T</strong></td><td>ൂ (Uu matra)</td><td>ഊ (UU)</td></tr>
+            <tr><td><strong>Z</strong></td><td>െ (E matra)</td><td>എ (E)</td></tr>
+            <tr><td><strong>S</strong></td><td>േ (Ee matra)</td><td>ഏ (EE)</td></tr>
+            <tr><td><strong>W</strong></td><td>ൈ (Ai matra)</td><td>ഐ (AI)</td></tr>
+            <tr><td><strong>A</strong></td><td>ോ (Oo matra)</td><td>ഓ (OO)</td></tr>
+            <tr><td><strong>Q</strong></td><td>ൗ (Au matra)</td><td>ഔ (AU)</td></tr>
+            <tr><td><strong>X</strong></td><td>ം (അനുസ്വാരം)</td><td>ZWNJ (വിഘടകം)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>2. ചില്ലക്ഷരങ്ങൾ ടൈപ്പ് ചെയ്യുന്ന വിധം (Chillu Characters)</h3>
+        <p>അക്ഷരം + ചന്ദ്രക്കല (<strong>d</strong>) + ZWJ (<strong>]</strong>) അല്ലെങ്കിൽ മുകളിലെ <strong>"ചില്ലുകൾ"</strong> ടാബിലെ നേരിട്ടുള്ള ബട്ടണുകൾ ഉപയോഗിക്കുക:</p>
+        <ul>
+          <li><strong>ർ</strong> = ര (j) + ് (d) + ZWJ (])</li>
+          <li><strong>ൽ</strong> = ല (n) + ് (d) + ZWJ (])</li>
+          <li><strong>ൾ</strong> = ള (Shift+N) + ് (d) + ZWJ (])</li>
+          <li><strong>ൻ</strong> = ന (v) + ് (d) + ZWJ (])</li>
+          <li><strong>ൺ</strong> = ണ (Shift+C) + ് (d) + ZWJ (])</li>
+        </ul>
+
+        <h3>3. കൂട്ടക്ഷരങ്ങൾ (Conjuncts)</h3>
+        <p>രണ്ട് വ്യഞ്ജനങ്ങൾക്കിടയിൽ ചന്ദ്രക്കല (<strong>d</strong>) ടൈപ്പ് ചെയ്താൽ കൂട്ടക്ഷരമായി മാറും:</p>
+        <ul>
+          <li><strong>ക</strong> (k) + <strong>്</strong> (d) + <strong>ഷ</strong> (Shift+,) = <strong>ക്ഷ</strong></li>
+          <li><strong>ത</strong> (l) + <strong>്</strong> (d) + <strong>ര</strong> (j) = <strong>ത്ര</strong></li>
+          <li><strong>ജ</strong> (p) + <strong>്</strong> (d) + <strong>ഞ</strong> (Shift+]) = <strong>ജ്ഞ</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Typing Practice & Tutor Modal -->
+  <div id="practiceModal" class="modal hidden">
+    <div class="modal-content practice-modal-content">
+      <div class="modal-header">
+        <h2>ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് പരിശീലനം (InScript Tutor)</h2>
+        <button type="button" id="closePracticeBtn" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="practice-controls">
+          <label for="practiceLessonSelect"><strong>പാഠം തിരഞ്ഞെടുക്കുക:</strong></label>
+          <select id="practiceLessonSelect" class="app-select">
+            <option value="1">പാഠം 1: ഹോം റോ കീകൾ (Home Row)</option>
+            <option value="2">പാഠം 2: മുകളിലെ വരി (Top Row)</option>
+            <option value="3">പാഠം 3: താഴത്തെ വരി (Bottom Row)</option>
+            <option value="4">പാഠം 4: ചില്ലുകളും കൂട്ടക്ഷരങ്ങളും</option>
+            <option value="5">പാഠം 5: നിത്യോപയോഗ വാക്കുകൾ (Words)</option>
+          </select>
+        </div>
+
+        <div class="practice-display-card">
+          <div class="practice-text-target" id="practiceTargetText"></div>
+          <div class="practice-current-indicator">അടുത്ത അക്ഷരം: <span id="practiceNextChar" class="highlight-char">-</span></div>
+        </div>
+
+        <div class="practice-metrics-row">
+          <div class="metric-card">
+            <span class="metric-label">പുരോഗതി (Progress)</span>
+            <span class="metric-value" id="practiceProgress">0%</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">കൃത്യത (Accuracy)</span>
+            <span class="metric-value" id="practiceAccuracy">100%</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">വേഗത (WPM)</span>
+            <span class="metric-value" id="practiceWpm">0</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">തെറ്റുകൾ (Errors)</span>
+            <span class="metric-value" id="practiceErrors">0</span>
+          </div>
+        </div>
+
+        <div class="practice-actions">
+          <button type="button" id="restartPracticeBtn" class="btn"><span>🔄 വീണ്ടും തുടങ്ങുക</span></button>
+          <button type="button" id="startPracticeBtn" class="btn btn-primary"><span>▶️ ടൈപ്പ് ചെയ്തു തുടങ്ങുക</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Malayalam Typing Speed Test Modal -->
+  <div id="speedTestModal" class="modal hidden">
+    <div class="modal-content speedtest-modal-content">
+      <div class="modal-header">
+        <h2>⚡ മലയാളം ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് (Typing Speed Test)</h2>
+        <button type="button" id="closeSpeedTestBtn" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Configuration & Duration Selector -->
+        <div id="speedTestConfigRow" class="speed-config-row">
+          <div class="duration-selector-group">
+            <span class="config-label">ടെസ്റ്റ് സമയം തിരഞ്ഞെടുക്കുക:</span>
+            <div class="duration-buttons">
+              <button type="button" class="btn duration-btn active" data-minutes="1">1 മിനിറ്റ്</button>
+              <button type="button" class="btn duration-btn" data-minutes="2">2 മിനിറ്റ്</button>
+              <button type="button" class="btn duration-btn" data-minutes="3">3 മിനിറ്റ്</button>
+              <button type="button" class="btn duration-btn" data-minutes="4">4 മിനിറ്റ്</button>
+              <button type="button" class="btn duration-btn" data-minutes="5">5 മിനിറ്റ്</button>
+            </div>
+          </div>
+          <button type="button" id="startSpeedTestBtn" class="btn btn-primary btn-start-test">
+            <span>🚀 ടെസ്റ്റ് ആരംഭിക്കുക</span>
+          </button>
+        </div>
+
+        <!-- Live Speed Test Active Area -->
+        <div id="speedTestActiveArea" class="speed-active-area">
+          <!-- Live Metrics & Countdown Bar -->
+          <div class="speed-live-bar">
+            <div class="live-timer-box">
+              <span class="timer-icon">⏱️</span>
+              <span id="speedTestTimer" class="timer-digits">01:00</span>
+            </div>
+            <div class="live-metric-item">
+              <span class="label">വേഗത:</span>
+              <strong id="liveNetWpm">0</strong> <small>WPM</small>
+            </div>
+            <div class="live-metric-item">
+              <span class="label">കൃത്യത:</span>
+              <strong id="liveAccuracy">100%</strong>
+            </div>
+            <div class="live-metric-item">
+              <span class="label">ശരിയായ വാക്കുകൾ:</span>
+              <strong id="liveCorrectWords" class="text-success">0</strong>
+            </div>
+          </div>
+
+          <!-- Passage Display with Word Highlighting -->
+          <div class="speed-passage-card">
+            <div id="speedWordsContainer" class="speed-words-flow">
+              <!-- Dynamically populated words -->
+            </div>
+          </div>
+
+          <!-- Typing Input Field -->
+          <div class="speed-input-container">
+            <input
+              type="text"
+              id="speedTestInput"
+              class="speed-typing-input"
+              placeholder="മുകളിലെ വാക്ക് കണ്ട് സ്പേസ് ബാർ അടിച്ച് ടൈപ്പ് ചെയ്യുക..."
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              disabled
+            />
+            <button type="button" id="resetSpeedTestBtn" class="btn" title="പുനരാരംഭിക്കുക">
+              <span>🔄 റീസെറ്റ്</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Results Card (Shown at the end of the test) -->
+        <div id="speedTestResultsCard" class="speed-results-card hidden">
+          <div class="result-badge-container">
+            <div class="result-badge-icon" id="resultRankBadge">👑</div>
+            <h3 id="resultRankTitle">ഇൻസ്ക്രിപ്റ്റ് മാസ്റ്റർ</h3>
+            <p class="result-subtitle">നിങ്ങളുടെ മലയാളം ടൈപ്പിംഗ് സ്പീഡ് ഫലം</p>
+          </div>
+
+          <div class="result-stats-grid">
+            <div class="result-stat-card primary-score">
+              <span class="stat-number" id="resultNetWpm">0</span>
+              <span class="stat-title">നെറ്റ് സ്പീഡ് (WPM)</span>
+            </div>
+            <div class="result-stat-card">
+              <span class="stat-number" id="resultAccuracy">0%</span>
+              <span class="stat-title">കൃത്യത (Accuracy)</span>
+            </div>
+            <div class="result-stat-card">
+              <span class="stat-number" id="resultGrossWpm">0</span>
+              <span class="stat-title">ഗ്രോസ് സ്പീഡ് (WPM)</span>
+            </div>
+            <div class="result-stat-card">
+              <span class="stat-number" id="resultCorrectWords">0</span>
+              <span class="stat-title">ശരിയായ വാക്കുകൾ</span>
+            </div>
+            <div class="result-stat-card">
+              <span class="stat-number" id="resultIncorrectWords">0</span>
+              <span class="stat-title">തെറ്റായ വാക്കുകൾ</span>
+            </div>
+            <div class="result-stat-card">
+              <span class="stat-number" id="resultTotalChars">0</span>
+              <span class="stat-title">ആകെ അക്ഷരങ്ങൾ</span>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button type="button" id="copyResultCardBtn" class="btn btn-primary">
+              <span>📋 സ്കോർ കാർഡ് കോപ്പി ചെയ്യുക</span>
+            </button>
+            <button type="button" id="retakeSpeedTestBtn" class="btn">
+              <span>🔄 വീണ്ടും ടെസ്റ്റ് ചെയ്യുക</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Message -->
+  <div id="appToast" class="toast"></div>
+
+  <!-- Application Bootstrap: Standard script tag ensuring 100% functionality on both file:/// direct click and http/https -->
+  <script src="src/bundle.js"></script>
+
+  <!-- Service Worker Registration for PWA / Offline Support (Only on HTTP/HTTPS) -->
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
+

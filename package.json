@@ -1,0 +1,22 @@
+{
+  "name": "malayalam-inscript-typing",
+  "version": "1.0.0",
+  "description": "Professional Malayalam InScript typing interface supporting mobile, tablet, and desktop with advanced Unicode shaping.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "malayalam",
+    "inscript",
+    "keyboard",
+    "unicode",
+    "mobile",
+    "tablet",
+    "typing"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
