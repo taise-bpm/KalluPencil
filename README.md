@@ -1,4 +1,4 @@
-# മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് (Malayalam InScript Typing Interface)
+# കല്ലുപെൻസിൽ (Kallu Pencil) - മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ്
 
 A modern, high-performance Malayalam InScript typing web application designed specifically to solve the limitations of existing online tools on **mobile phones, tablets, and desktop computers**, while providing pristine **Malayalam Unicode ligature rendering and editing**.
 

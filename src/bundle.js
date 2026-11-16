@@ -3087,7 +3087,7 @@
     copySpeedResultCard() {
       if (!this.lastSpeedMetrics) return;
       const m = this.lastSpeedMetrics;
-      const text = `⚡ മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് ⚡
+      const text = `⚡ കല്ലുപെൻസിൽ (Kallu Pencil) ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് ⚡
 -----------------------------------------
 🏆 റാങ്ക്: ${m.badge} ${m.rank}
 ⚡ നെറ്റ് സ്പീഡ്: ${m.netWpm} WPM
@@ -3097,7 +3097,7 @@
 ❌ തെറ്റായ വാക്കുകൾ: ${m.incorrectWords}
 ⏱️ സമയം: ${this.speedTestDuration} മിനിറ്റ്
 -----------------------------------------
-മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ഇന്റർഫേസ് ഉപയോഗിച്ച് പരീക്ഷിച്ച ഫലം`;
+കല്ലുപെൻസിൽ (Kallu Pencil) വഴി പരീക്ഷിച്ച ഫലം`;
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
@@ -3316,7 +3316,7 @@
     copySpeedResultCard() {
       if (!this.lastSpeedMetrics) return;
       const m = this.lastSpeedMetrics;
-      const text = `⚡ മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് ⚡
+      const text = `⚡ കല്ലുപെൻസിൽ (Kallu Pencil) ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് ⚡
 -----------------------------------------
 🏆 റാങ്ക്: ${m.badge} ${m.rank}
 ⚡ നെറ്റ് സ്പീഡ്: ${m.netWpm} WPM
@@ -3326,7 +3326,7 @@
 ❌ തെറ്റായ വാക്കുകൾ: ${m.incorrectWords}
 ⏱️ സമയം: ${this.speedTestDuration} മിനിറ്റ്
 -----------------------------------------
-മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ഇന്റർഫേസ് ഉപയോഗിച്ച് പരീക്ഷിച്ച ഫലം`;
+കല്ലുപെൻസിൽ (Kallu Pencil) വഴി പരീക്ഷിച്ച ഫലം`;
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {

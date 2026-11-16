@@ -1632,7 +1632,7 @@
       const stage = this.tutorEngine.currentStage;
       const stars = '⭐'.repeat(metrics.stars);
 
-      const text = `🏆 മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ ഫലം 🏆
+      const text = `🏆 കല്ലുപെൻസിൽ (Kallu Pencil) ട്യൂട്ടർ ഫലം 🏆
 -----------------------------------------
 📚 പാഠം: ${stage.id} - ${stage.title}
 ⭐ സ്റ്റാർ റേറ്റിംഗ്: ${stars}
@@ -1640,7 +1640,7 @@
 🎯 കൃത്യത: ${metrics.accuracy}%
 ❌ തെറ്റുകൾ: ${metrics.errors}
 -----------------------------------------
-മലയാളം ഇൻസ്ക്രിപ്റ്റ് മാസ്റ്റർ ടൈപ്പിംഗ് ട്യൂട്ടർ വഴി പരിശീലിച്ചത്`;
+കല്ലുപെൻസിൽ (Kallu Pencil) ട്യൂട്ടർ വഴി പരിശീലിച്ചത്`;
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {

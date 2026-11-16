@@ -1,7 +1,7 @@
 {
-  "name": "മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് (Malayalam InScript Typing)",
-  "short_name": "ML InScript",
-  "description": "Professional Malayalam InScript typing interface with Unicode ligature support for mobile, tablet, and desktop.",
+  "name": "കല്ലുപെൻസിൽ (Kallu Pencil) - മലയാളം ടൈപ്പിംഗ്",
+  "short_name": "കല്ലുപെൻസിൽ",
+  "description": "കല്ലുപെൻസിൽ (Kallu Pencil) - Professional Malayalam InScript typing interface with Unicode ligature support, Speed Test & InScript Tutor.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -16,4 +16,3 @@
     }
   ]
 }
-
