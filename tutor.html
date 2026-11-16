@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="ml" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="description" content="മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ (Malayalam InScript Typing Tutor) - സ്വതന്ത്രമായി വേഗത്തിൽ മലയാളം ടൈപ്പിംഗ് പഠിക്കാനുള്ള മികച്ച ആപ്ലിക്കേഷൻ.">
+  <meta name="description"
+    content="മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ (Malayalam InScript Typing Tutor) - സ്വതന്ത്രമായി വേഗത്തിൽ മലയാളം ടൈപ്പിംഗ് പഠിക്കാനുള്ള മികച്ച ആപ്ലിക്കേഷൻ.">
   <meta name="theme-color" content="#0ea5e9">
   <title>മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ | InScript Master Tutor</title>
-  
+
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/tutor.css">
 </head>
+
 <body class="tutor-app-body">
   <main class="tutor-standalone-app">
 
@@ -107,12 +110,14 @@
       </div>
 
       <div class="subnav-right">
-        <button class="btn btn-secondary nav-restart-btn" id="restartLessonBtn" type="button" title="പാഠം വീണ്ടും ആരംഭിക്കുക">
+        <button class="btn btn-secondary nav-restart-btn" id="restartLessonBtn" type="button"
+          title="പാഠം വീണ്ടും ആരംഭിക്കുക">
           <span class="btn-icon">🔄</span>
           <span class="btn-label-full">വീണ്ടും തുടങ്ങുക</span>
           <span class="btn-label-short">വീണ്ടും</span>
         </button>
-        <button class="btn btn-primary nav-stage-btn" id="nextStageBtn" type="button" title="അടുത്ത പാഠത്തിലേക്ക് പോവുക">
+        <button class="btn btn-primary nav-stage-btn" id="nextStageBtn" type="button"
+          title="അടുത്ത പാഠത്തിലേക്ക് പോവുക">
           <span class="btn-label-full">അടുത്ത പാഠം</span>
           <span class="btn-label-short">അടുത്തത്</span>
           <span class="btn-arrow">▶</span>
@@ -165,13 +170,15 @@
             <rect id="finger-LR" class="hand-finger" x="29" y="16" width="9" height="34" rx="4.5" />
             <rect id="finger-LM" class="hand-finger" x="41" y="10" width="9" height="40" rx="4.5" />
             <rect id="finger-LI" class="hand-finger" x="53" y="18" width="9" height="32" rx="4.5" />
-            <rect id="finger-LT" class="hand-finger" x="63" y="34" width="9" height="22" rx="4.5" transform="rotate(28 67 45)" />
+            <rect id="finger-LT" class="hand-finger" x="63" y="34" width="9" height="22" rx="4.5"
+              transform="rotate(28 67 45)" />
             <text class="hand-label" x="45" y="86" text-anchor="middle">ഇടതു കൈ</text>
           </g>
           <!-- RIGHT HAND -->
           <g id="hand-right">
             <rect class="hand-palm" x="192" y="42" width="46" height="30" rx="8" />
-            <rect id="finger-RT" class="hand-finger" x="188" y="34" width="9" height="22" rx="4.5" transform="rotate(-28 193 45)" />
+            <rect id="finger-RT" class="hand-finger" x="188" y="34" width="9" height="22" rx="4.5"
+              transform="rotate(-28 193 45)" />
             <rect id="finger-RI" class="hand-finger" x="198" y="18" width="9" height="32" rx="4.5" />
             <rect id="finger-RM" class="hand-finger" x="210" y="10" width="9" height="40" rx="4.5" />
             <rect id="finger-RR" class="hand-finger" x="222" y="16" width="9" height="34" rx="4.5" />
@@ -230,6 +237,10 @@
         </button>
       </div>
 
+      <div class="tutor-keyboard-slot finger-colors-enabled" id="tutorKeyboardContainer">
+        <!-- Rendered dynamically by StandaloneKeyboard -->
+      </div>
+
       <div class="finger-legend-strip" aria-label="വിരൽ നിറങ്ങളുടെ വിശദീകരണം">
         <span class="legend-chip"><span class="chip-dot" style="background:#ec4899;"></span> ചെറുവിരൽ (Pinky L)</span>
         <span class="legend-chip"><span class="chip-dot" style="background:#8b5cf6;"></span> മോതിരവിരൽ (Ring L)</span>
@@ -240,10 +251,6 @@
         <span class="legend-chip"><span class="chip-dot" style="background:#06b6d4;"></span> നടുവിരൽ (Mid R)</span>
         <span class="legend-chip"><span class="chip-dot" style="background:#a855f7;"></span> മോതിരവിരൽ (Ring R)</span>
         <span class="legend-chip"><span class="chip-dot" style="background:#f43f5e;"></span> ചെറുവിരൽ (Pinky R)</span>
-      </div>
-
-      <div class="tutor-keyboard-slot finger-colors-enabled" id="tutorKeyboardContainer">
-        <!-- Rendered dynamically by StandaloneKeyboard -->
       </div>
     </section>
 
@@ -310,4 +317,5 @@
   <!-- Standalone Tutor Application Script -->
   <script src="src/tutor-app.js"></script>
 </body>
+
 </html>
