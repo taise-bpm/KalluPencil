@@ -44,7 +44,22 @@ A modern, high-performance Malayalam InScript typing web application designed sp
   - One-click **Copy Result Card** with formatted emoji text to share on WhatsApp, Telegram, or social media!
 * **Works on All Devices:** Compatible with both the On-Screen Touch InScript Keyboard (phones/tablets) and Hardware Keyboards (desktops/laptops).
 
-### 5. Productive Utilities
+### 5. 🎯 InScript Master Typing Tutor (ഇന്ററാക്ടീവ് ട്യൂട്ടർ)
+* **7 Progressive Learning Levels (20+ Stages):**
+  - **ലെവൽ 1:** ഹോം റോ (Home Row Fundamentals - ക, ര, പ, ത, ച, ട, ്, ി, ു, േ, ോ)
+  - **ലെവൽ 2:** മുകളിലെ വരി (Top Row QWERTY - ബ, ഹ, ഗ, ദ, ജ, ഡ, ാ, ീ, ൂ, ൈ, ൌ)
+  - **ലെവൽ 3:** താഴത്തെ വരി (Bottom Row ZXCV - െ, ം, മ, ന, വ, ല, സ, യ)
+  - **ലെവൽ 4:** ഷിഫ്റ്റ് കീകൾ (Shift Layer - സ്വതന്ത്ര സ്വരങ്ങൾ & മഹാപ്രാണങ്ങൾ)
+  - **ലെവൽ 5:** ചില്ലക്ഷരങ്ങൾ (Chillus - ൺ, ൻ, ർ, ൽ, ൾ, ൿ)
+  - **ലെവൽ 6:** കൂട്ടക്ഷരങ്ങൾ (Conjuncts - ക്ഷ, ജ്ഞ, ത്ര, ശ്ര, പ്ര, ക്ക, ച്ച, ത്ത...)
+  - **ലെവൽ 7:** വാക്യങ്ങളും വേഗതയും (Sentences & Quotes)
+* **Visual Finger Placement Guidance:** 
+  - Real-time hand and finger indicators (Left/Right Hand, Pinky, Ring, Middle, Index, Thumb) color-coded for each key.
+  - Clear instructions: English key equivalent, finger name in Malayalam & English, and Shift requirement.
+* **Interactive Keyboard Key Glow:** As you learn, the exact key on the visual keyboard pulses and glows with amber light (`practice-target`).
+* **Gamified Star Ratings & Progress:** Earn ⭐ to ⭐⭐⭐ based on accuracy and speed; your stage stars are saved in `localStorage`!
+
+### 6. Productive Utilities
 * **One-Tap Clipboard Copy:** With instant toast notification.
 * **Export Options:** Download as clean UTF-8 text (`.txt` with BOM for universal Notepad/editor compatibility) or Word Document (`.doc` formatted with Malayalam typography).
 * **Native Web Share:** Share text directly to WhatsApp, Telegram, or Gmail on mobile (`navigator.share`).

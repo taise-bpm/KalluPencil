@@ -173,9 +173,11 @@
     </main>
 
     <!-- Virtual InScript Keyboard Section -->
-    <section id="virtualKeyboard" class="keyboard-section">
-      <!-- Dynamic Keyboard Content Injected by virtual-keyboard.js -->
-    </section>
+    <div id="mainKeyboardSlot">
+      <section id="virtualKeyboard" class="keyboard-section">
+        <!-- Dynamic Keyboard Content Injected by virtual-keyboard.js -->
+      </section>
+    </div>
   </div>
 
   <!-- InScript Layout & Shortcut Guide Modal -->
@@ -231,30 +233,94 @@
     </div>
   </div>
 
-  <!-- Typing Practice & Tutor Modal -->
+  <!-- Interactive InScript Master Typing Tutor Modal -->
   <div id="practiceModal" class="modal hidden">
-    <div class="modal-content practice-modal-content">
+    <div class="modal-content practice-modal-content tutor-modal-layout">
       <div class="modal-header">
-        <h2>ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് പരിശീലനം (InScript Tutor)</h2>
+        <div class="tutor-header-title">
+          <h2>🎯 ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ (InScript Master Tutor)</h2>
+          <span class="sub-badge">ഇന്ററാക്ടീവ് പാഠങ്ങൾ</span>
+        </div>
         <button type="button" id="closePracticeBtn" class="close-btn">&times;</button>
       </div>
-      <div class="modal-body">
-        <div class="practice-controls">
-          <label for="practiceLessonSelect"><strong>പാഠം തിരഞ്ഞെടുക്കുക:</strong></label>
-          <select id="practiceLessonSelect" class="app-select">
-            <option value="1">പാഠം 1: ഹോം റോ കീകൾ (Home Row)</option>
-            <option value="2">പാഠം 2: മുകളിലെ വരി (Top Row)</option>
-            <option value="3">പാഠം 3: താഴത്തെ വരി (Bottom Row)</option>
-            <option value="4">പാഠം 4: ചില്ലുകളും കൂട്ടക്ഷരങ്ങളും</option>
-            <option value="5">പാഠം 5: നിത്യോപയോഗ വാക്കുകൾ (Words)</option>
-          </select>
+
+      <div class="modal-body tutor-modal-body">
+        <!-- Stage / Level Navigation Bar -->
+        <div class="tutor-nav-row">
+          <div class="tutor-select-group">
+            <label for="practiceStageSelect"><strong>പാഠം തിരഞ്ഞെടുക്കുക:</strong></label>
+            <select id="practiceStageSelect" class="app-select tutor-stage-select">
+              <optgroup label="ലെവൽ 1: ഹോം റോ (Home Row Fundamentals)">
+                <option value="1-1">പാഠം 1.1: വലതു കൈ വ്യഞ്ജനങ്ങൾ (പ, ര, ക, ത)</option>
+                <option value="1-2">പാഠം 1.2: ച, ട എന്നിവ കൂട്ടിച്ചേർക്കുക</option>
+                <option value="1-3">പാഠം 1.3: ഇടതു കൈ സ്വരചിഹ്നങ്ങളും ചന്ദ്രക്കലയും (്, ി, ു, േ, ോ)</option>
+                <option value="1-4">പാഠം 1.4: ഹോം റോ ലളിത പദങ്ങൾ (Words)</option>
+              </optgroup>
+              <optgroup label="ലെവൽ 2: മുകളിലെ വരി (Top Row QWERTY)">
+                <option value="2-1">പാഠം 2.1: മുകളിലെ സ്വരചിഹ്നങ്ങൾ (ാ, ീ, ൂ, ൈ, ൌ)</option>
+                <option value="2-2">പാഠം 2.2: മുകളിലെ വ്യഞ്ജനങ്ങൾ (ബ, ഹ, ഗ, ദ, ജ, ഡ)</option>
+                <option value="2-3">പാഠം 2.3: രണ്ടു വരികൾ ചേർത്തുള്ള വാക്കുകൾ</option>
+              </optgroup>
+              <optgroup label="ലെവൽ 3: താഴത്തെ വരി (Bottom Row ZXCV)">
+                <option value="3-1">പാഠം 3.1: താഴത്തെ വരി കീകൾ (െ, ം, മ, ന, വ, ല, സ, യ)</option>
+                <option value="3-2">പാഠം 3.2: മൂന്നു വരികളും ചേർത്തുള്ള വാക്കുകൾ</option>
+              </optgroup>
+              <optgroup label="ലെവൽ 4: ഷിഫ്റ്റ് കീകൾ - സ്വരങ്ങളും മഹാപ്രാണങ്ങളും (Shift Layer)">
+                <option value="4-1">പാഠം 4.1: സ്വതന്ത്ര സ്വരങ്ങൾ (അ, ആ, ഇ, ഈ, ഉ, ഊ...)</option>
+                <option value="4-2">പാഠം 4.2: മഹാപ്രാണാക്ഷരങ്ങൾ (ഖ, ഘ, ഛ, ഝ, ഠ, ഢ, ഥ, ധ, ഫ, ഭ)</option>
+                <option value="4-3">പാഠം 4.3: ശ, ഷ, ള, ഴ, റ, ണ, ങ, ഞ</option>
+              </optgroup>
+              <optgroup label="ലെവൽ 5: ചില്ലക്ഷരങ്ങൾ (Chillu Characters)">
+                <option value="5-1">പാഠം 5.1: ർ, ൽ, ൾ ചില്ലുകൾ (ര+്+ZWJ)</option>
+                <option value="5-2">പാഠം 5.2: ൻ, ൺ, ൿ ചില്ലുകൾ</option>
+              </optgroup>
+              <optgroup label="ലെവൽ 6: കൂട്ടക്ഷരങ്ങൾ (Conjuncts)">
+                <option value="6-1">പാഠം 6.1: ക്ഷ, ജ്ഞ, ത്ര, ശ്ര, പ്ര</option>
+                <option value="6-2">പാഠം 6.2: ഇരട്ട അക്ഷരങ്ങൾ (ക്ക, ച്ച, ട്ട, ത്ത, പ്പ, റ്റ)</option>
+                <option value="6-3">പാഠം 6.3: അനുനാസിക കൂട്ടക്ഷരങ്ങൾ (ങ്ങ, ഞ്ച, ണ്ട, ന്ത, മ്പ, മ്മ)</option>
+              </optgroup>
+              <optgroup label="ലെവൽ 7: വാക്യങ്ങളും വേഗതയും (Full Sentences & Speed)">
+                <option value="7-1">പാഠം 7.1: ലളിത വാക്യങ്ങൾ (Simple Sentences)</option>
+                <option value="7-2">പാഠം 7.2: പ്രചോദനാത്മക വാക്യങ്ങൾ (Inspiring Quotes)</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="stage-stars-display" id="stageStarsDisplay">⭐⭐⭐</div>
         </div>
 
-        <div class="practice-display-card">
-          <div class="practice-text-target" id="practiceTargetText"></div>
-          <div class="practice-current-indicator">അടുത്ത അക്ഷരം: <span id="practiceNextChar" class="highlight-char">-</span></div>
+        <!-- Dynamic Finger Guidance Card -->
+        <div class="tutor-finger-guide-card" id="tutorFingerGuideCard">
+          <div class="target-char-display-box">
+            <span class="guide-target-char" id="guideTargetChar">ക</span>
+            <span class="guide-target-name" id="guideTargetName">അക്ഷരം: ക</span>
+          </div>
+          <div class="finger-instructions-box">
+            <div class="instruction-row">
+              <span class="instr-label">ഉപയോഗിക്കേണ്ട വിരൽ:</span>
+              <span class="finger-badge" id="guideFingerBadge">
+                <span class="finger-dot" id="guideFingerDot"></span>
+                <strong id="guideFingerName">വലതു കൈ നടുവിരൽ</strong>
+              </span>
+            </div>
+            <div class="instruction-row">
+              <span class="instr-label">കീബോർഡ് കീ:</span>
+              <span class="key-pill" id="guideKeyName">Key K</span>
+              <span class="shift-requirement-pill" id="guideShiftReq">സാധാരണ അമർത്തുക</span>
+            </div>
+            <div class="instruction-row hint-desc" id="guideDescription">
+              ക (K) - നടുവിരൽ ഉപയോഗിച്ച് ടൈപ്പ് ചെയ്യുക
+            </div>
+          </div>
         </div>
 
+        <!-- Target Text Stream with Interactive Highlighting -->
+        <div class="tutor-display-card">
+          <div class="tutor-text-stream" id="practiceTargetStream">
+            <!-- Dynamically populated character spans -->
+          </div>
+        </div>
+
+        <!-- Live Metrics Bar -->
         <div class="practice-metrics-row">
           <div class="metric-card">
             <span class="metric-label">പുരോഗതി (Progress)</span>
@@ -274,9 +340,39 @@
           </div>
         </div>
 
+        <!-- In-Modal Interactive InScript Keyboard Dock -->
+        <div class="tutor-keyboard-dock-wrapper" id="tutorKeyboardDockWrapper">
+          <div class="tutor-keyboard-dock-header">
+            <span class="dock-title">⌨️ ഇൻസ്ക്രിപ്റ്റ് കീബോർഡ് ലൈവ് ഗൈഡ് (InScript Visual Guide)</span>
+            <span class="dock-hint">തിളങ്ങുന്ന കീ അമർത്തുക (Tap glowing key or press on keyboard)</span>
+          </div>
+          <div id="tutorKeyboardDock" class="tutor-keyboard-dock"></div>
+        </div>
+
+        <!-- Lesson Completion / Celebration Card (Hidden during typing) -->
+        <div id="tutorCompletionCard" class="tutor-completion-card hidden">
+          <div class="completion-icon">🏆</div>
+          <h3 id="completionTitle">പാഠം പൂർത്തിയായി! (Lesson Completed)</h3>
+          <div class="completion-stars" id="completionStars">⭐⭐⭐</div>
+          <p id="completionSummary">അതിശയകരമായ പ്രകടനം! 98% കൃത്യതയോടെ നിങ്ങൾ ഈ പാഠം പൂർത്തിയാക്കി.</p>
+          <div class="completion-actions">
+            <button type="button" id="nextStageBtn" class="btn btn-primary">
+              <span>അടുത്ത പാഠം (Next Lesson) ➡️</span>
+            </button>
+            <button type="button" id="restartPracticeBtn" class="btn">
+              <span>🔄 വീണ്ടും ചെയ്യുക</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bottom Actions -->
         <div class="practice-actions">
-          <button type="button" id="restartPracticeBtn" class="btn"><span>🔄 വീണ്ടും തുടങ്ങുക</span></button>
-          <button type="button" id="startPracticeBtn" class="btn btn-primary"><span>▶️ ടൈപ്പ് ചെയ്തു തുടങ്ങുക</span></button>
+          <button type="button" id="startPracticeBtn" class="btn btn-primary">
+            <span>▶️ പരിശീലനം തുടങ്ങുക</span>
+          </button>
+          <button type="button" id="resetTutorBtn" class="btn">
+            <span>🔄 റീസെറ്റ്</span>
+          </button>
         </div>
       </div>
     </div>

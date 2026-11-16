@@ -842,6 +842,31 @@
       });
     }
 
+    highlightTutorKey(code, isShift = false) {
+      this.clearTutorHighlights();
+      if (!code) return;
+
+      const keyEl = this.keyElementsMap.get(code);
+      if (keyEl) {
+        keyEl.classList.add('practice-target');
+      }
+
+      if (isShift) {
+        const shiftBtns = this.container.querySelectorAll('.key-shift');
+        shiftBtns.forEach((btn) => btn.classList.add('practice-target'));
+        this.setShift(true, false);
+      } else {
+        if (!this.isCapsLocked) {
+          this.setShift(false, false);
+        }
+      }
+    }
+
+    clearTutorHighlights() {
+      const highlighted = this.container.querySelectorAll('.practice-target');
+      highlighted.forEach((el) => el.classList.remove('practice-target'));
+    }
+
     insertText(char) {
       if (this.options.getActiveTarget) {
         const target = this.options.getActiveTarget();
@@ -1017,8 +1042,18 @@
 
     setupPhysicalKeyboardListeners() {
       window.addEventListener('keydown', (e) => {
+        const isTutorActive = this.options.isTutorActive && this.options.isTutorActive();
         const isSpeedInput = e.target && e.target.id === 'speedTestInput';
-        if (!isSpeedInput && e.target !== this.editor.textarea && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) {
+
+        if (isTutorActive) {
+          // If stage dropdown is focused, allow navigation keys or blur on typing
+          if (e.target && e.target.id === 'practiceStageSelect') {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Tab' || e.key === 'Enter') {
+              return;
+            }
+            e.target.blur();
+          }
+        } else if (!isSpeedInput && e.target !== this.editor.textarea && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) {
           return;
         }
 
@@ -1057,8 +1092,9 @@
         }
 
         const mapEntry = INSCRIPT_MAP[code];
+        const allowPhysical = isTutorActive || this.options.physicalKeyboardEnabled !== false;
 
-        if (mapEntry && this.options.physicalKeyboardEnabled !== false) {
+        if (mapEntry && allowPhysical) {
           e.preventDefault();
           const isShift = e.shiftKey || this.isCapsLocked;
           const charToInsert = isShift ? mapEntry.shift : mapEntry.normal;
@@ -1066,11 +1102,11 @@
             this.insertText(charToInsert);
             feedback.feedback(false);
           }
-        } else if (code === 'Backspace' && this.options.physicalKeyboardEnabled !== false) {
+        } else if (code === 'Backspace' && allowPhysical) {
           e.preventDefault();
           this.smartBackspace();
           feedback.feedback(true);
-        } else if (code === 'Space' && this.options.physicalKeyboardEnabled !== false) {
+        } else if (code === 'Space' && allowPhysical) {
           e.preventDefault();
           this.insertText(' ');
           feedback.feedback(false);
@@ -1285,7 +1321,545 @@
   }
 
   /* =========================================================
-     5. Main Malayalam Typing Application
+     7. Malayalam Speech-to-Text Engine (Voice Typing)
+     ========================================================= */
+  class MalayalamSpeechEngine {
+    constructor(options = {}) {
+      this.onResult = options.onResult || (() => {});
+      this.onStatusChange = options.onStatusChange || (() => {});
+      this.onError = options.onError || (() => {});
+
+      this.recognition = null;
+      this.isListening = false;
+      this.init();
+    }
+
+    isSupported() {
+      return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+    }
+
+    init() {
+      if (!this.isSupported()) return;
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      this.recognition = new SpeechRecognition();
+      this.recognition.lang = 'ml-IN';
+      this.recognition.continuous = true;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        this.isListening = true;
+        this.onStatusChange(true);
+      };
+
+      this.recognition.onend = () => {
+        this.isListening = false;
+        this.onStatusChange(false);
+      };
+
+      this.recognition.onerror = (e) => {
+        this.isListening = false;
+        this.onStatusChange(false);
+        this.onError(e);
+      };
+
+      this.recognition.onresult = (e) => {
+        let final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) {
+            final += e.results[i][0].transcript;
+          }
+        }
+        if (final) {
+          this.onResult(final);
+        }
+      };
+    }
+
+    toggle() {
+      if (!this.isSupported()) {
+        alert('നിങ്ങളുടെ ബ്രൗസർ വോയ്‌സ് ടൈപ്പിംഗ് പിന്തുണയ്ക്കുന്നില്ല (Speech recognition not supported in this browser). Google Chrome അല്ലെങ്കിൽ Microsoft Edge ഉപയോഗിക്കുക.');
+        return;
+      }
+      if (this.isListening) {
+        this.stop();
+      } else {
+        this.start();
+      }
+    }
+
+    start() {
+      if (this.recognition && !this.isListening) {
+        try { this.recognition.start(); } catch {}
+      }
+    }
+
+    stop() {
+      if (this.recognition && this.isListening) {
+        this.recognition.stop();
+      }
+    }
+  }
+
+  /* =========================================================
+     8. InScript Typing Practice Tutor Curriculum & Engine
+     ========================================================= */
+  const FINGER_NAMES = {
+    LP: { en: 'Left Pinky', ml: 'ഇടതു കൈ ചെറുവിരൽ', color: '#ec4899' },
+    LR: { en: 'Left Ring', ml: 'ഇടതു കൈ മോതിരവിരൽ', color: '#8b5cf6' },
+    LM: { en: 'Left Middle', ml: 'ഇടതു കൈ നടുവിരൽ', color: '#3b82f6' },
+    LI: { en: 'Left Index', ml: 'ഇടതു കൈ ചൂണ്ടുവിരൽ', color: '#10b981' },
+    LT: { en: 'Left Thumb', ml: 'ഇടതു കൈ തള്ളവിരൽ', color: '#64748b' },
+    RT: { en: 'Right Thumb', ml: 'വലതു കൈ തള്ളവിരൽ', color: '#64748b' },
+    RI: { en: 'Right Index', ml: 'വലതു കൈ ചൂണ്ടുവിരൽ', color: '#f59e0b' },
+    RM: { en: 'Right Middle', ml: 'വലതു കൈ നടുവിരൽ', color: '#06b6d4' },
+    RR: { en: 'Right Ring', ml: 'വലതു കൈ മോതിരവിരൽ', color: '#a855f7' },
+    RP: { en: 'Right Pinky', ml: 'വലതു കൈ ചെറുവിരൽ', color: '#f43f5e' }
+  };
+
+  const KEY_FINGER_MAP = {
+    Backquote: 'LP', Digit1: 'LP', Digit2: 'LR', Digit3: 'LM', Digit4: 'LI', Digit5: 'LI',
+    Digit6: 'RI', Digit7: 'RI', Digit8: 'RM', Digit9: 'RR', Digit0: 'RP', Minus: 'RP', Equal: 'RP',
+    KeyQ: 'LP', KeyW: 'LR', KeyE: 'LM', KeyR: 'LI', KeyT: 'LI',
+    KeyY: 'RI', KeyU: 'RI', KeyI: 'RM', KeyO: 'RR', KeyP: 'RP', BracketLeft: 'RP', BracketRight: 'RP', Backslash: 'RP',
+    KeyA: 'LP', KeyS: 'LR', KeyD: 'LM', KeyF: 'LI', KeyG: 'LI',
+    KeyH: 'RI', KeyJ: 'RI', KeyK: 'RM', KeyL: 'RR', Semicolon: 'RP', Quote: 'RP',
+    KeyZ: 'LP', KeyX: 'LR', KeyC: 'LM', KeyV: 'LI', KeyB: 'LI',
+    KeyN: 'RI', KeyM: 'RI', Comma: 'RM', Period: 'RR', Slash: 'RP',
+    Space: 'RT'
+  };
+
+  const TUTOR_LEVELS = [
+    {
+      id: 'lvl-1',
+      level: 1,
+      title: 'ലെവൽ 1: ഹോം റോ (Home Row Fundamentals)',
+      subtitle: 'കൈവിരലുകൾ ഉറപ്പിച്ചു നിർത്തേണ്ട നടുവിലെ വരി (ASDFGHJKL;)',
+      stages: [
+        {
+          id: '1-1',
+          title: 'പാഠം 1.1: വലതു കൈ വ്യഞ്ജനങ്ങൾ (പ, ര, ക, ത)',
+          description: 'H, J, K, L എന്നീ കീകൾ പഠിക്കുക',
+          targetText: 'ക ര പ ത ക ര പ ത കക രര പപ തത കര പത തക രപ',
+          instructions: 'ക (K) - നടുവിരൽ | ര (J) - ചൂണ്ടുവിരൽ | പ (H) - ചൂണ്ടുവിരൽ | ത (L) - മോതിരവിരൽ'
+        },
+        {
+          id: '1-2',
+          title: 'പാഠം 1.2: ച, ട എന്നിവ കൂട്ടിച്ചേർക്കുക',
+          description: ';, \' എന്നീ കീകൾ പഠിക്കുക',
+          targetText: 'ച ട ക ര പ ത ചട രക പതി ചര ടക തച കപ',
+          instructions: 'ച (;) - ചെറുവിരൽ | ട (\') - ചെറുവിരൽ'
+        },
+        {
+          id: '1-3',
+          title: 'പാഠം 1.3: ഇടതു കൈ സ്വരചിഹ്നങ്ങളും ചന്ദ്രക്കലയും (്, ി, ു, േ, ോ)',
+          description: 'D, F, G, S, A എന്നീ കീകൾ പഠിക്കുക',
+          targetText: '് ി ു േ ോ കി കു തേ പോ ചി ടി ര് പു കി രീ',
+          instructions: '് (D) - നടുവിരൽ | ി (F) - ചൂണ്ടുവിരൽ | ു (G) - ചൂണ്ടുവിരൽ | േ (S) - മോതിരവിരൽ | ോ (A) - ചെറുവിരൽ'
+        },
+        {
+          id: '1-4',
+          title: 'പാഠം 1.4: ഹോം റോ വാക്കുകൾ (Home Row Words)',
+          description: 'ഹോം റോ കീകൾ മാത്രമുപയോഗിച്ച് വാക്കുകൾ ടൈപ്പ് ചെയ്യുക',
+          targetText: 'തകിട ചിരി കരി പതി ചരട് തോട് പേര് ചേര് ചോറ് പൊതി പോര്',
+          instructions: 'വിരലുകൾ ശരിയായ കീകളിൽ ഉറപ്പിച്ചു വെച്ച് സ്പേസ് ബാർ അടിച്ച് ടൈപ്പ് ചെയ്യുക'
+        }
+      ]
+    },
+    {
+      id: 'lvl-2',
+      level: 2,
+      title: 'ലെവൽ 2: മുകളിലെ വരി (Top Row QWERTY)',
+      subtitle: 'മുകളിലെ വരിയിലെ സ്വരചിഹ്നങ്ങളും വ്യഞ്ജനങ്ങളും (QWERTYUIOP[])',
+      stages: [
+        {
+          id: '2-1',
+          title: 'പാഠം 2.1: മുകളിലെ സ്വരചിഹ്നങ്ങൾ (ാ, ീ, ൂ, ൈ, ൌ)',
+          description: 'E, R, T, W, Q എന്നീ കീകൾ പഠിക്കുക',
+          targetText: 'ാ ീ ൂ ൈ ൌ കാ കീ കൂ കൈ കൗ പാ പീ പൂ പൈ പൗ',
+          instructions: 'ാ (E) - നടുവിരൽ | ീ (R) - ചൂണ്ടുവിരൽ | ൂ (T) - ചൂണ്ടുവിരൽ | ൈ (W) - മോതിരവിരൽ | ൌ (Q) - ചെറുവിരൽ'
+        },
+        {
+          id: '2-2',
+          title: 'പാഠം 2.2: മുകളിലെ വ്യഞ്ജനങ്ങൾ (ബ, ഹ, ഗ, ദ, ജ, ഡ)',
+          description: 'Y, U, I, O, P, [ എന്നീ കീകൾ പഠിക്കുക',
+          targetText: 'ബ ഹ ഗ ദ ജ ഡ ബഹ ഗദ ജഡ ബാ ഹീ ഗൂ ദൈ ജാ ഡാ',
+          instructions: 'ബ (Y) & ഹ (U) - ചൂണ്ടുവിരൽ | ഗ (I) - നടുവിരൽ | ദ (O) - മോതിരവിരൽ | ജ (P) & ഡ ([) - ചെറുവിരൽ'
+        },
+        {
+          id: '2-3',
+          title: 'പാഠം 2.3: രണ്ടു വരികൾ ചേർത്തുള്ള വാക്കുകൾ',
+          description: 'ഹോം റോയും ടോപ് റോയും കൂട്ടിച്ചേർത്തുള്ള പദങ്ങൾ',
+          targetText: 'ഗീത ദാഹം ജീവിതം ബാലൻ വീട് പാടം രോഗം കുട ജയം ദയ ബലം',
+          instructions: 'വിരലുകൾ മുകളിലെ വരിയിലേക്ക് ഉയർത്തി തിരിച്ചുവന്ന് ഹോം റോയിൽ നിലയുറപ്പിക്കുക'
+        }
+      ]
+    },
+    {
+      id: 'lvl-3',
+      level: 3,
+      title: 'ലെവൽ 3: താഴത്തെ വരി (Bottom Row ZXCV)',
+      subtitle: 'താഴത്തെ വരിയിലെ വ്യഞ്ജനങ്ങളും ചിഹ്നങ്ങളും (ZXCVBNM,./)',
+      stages: [
+        {
+          id: '3-1',
+          title: 'പാഠം 3.1: താഴത്തെ വരി കീകൾ (െ, ം, മ, ന, വ, ല, സ, യ)',
+          description: 'Z, X, C, V, B, N, M, / എന്നീ കീകൾ പഠിക്കുക',
+          targetText: 'െ ം മ ന വ ല സ യ മന വല സമ യമ മെ നം വം ലം സം',
+          instructions: 'െ (Z) - ചെറുവിരൽ | ം (X) - മോതിരവിരൽ | മ (C) - നടുവിരൽ | ന (V) - ചൂണ്ടുവിരൽ | വ (B) & ല (N) - ചൂണ്ടുവിരൽ | സ (M) - ചൂണ്ടുവിരൽ | യ (/) - ചെറുവിരൽ'
+        },
+        {
+          id: '3-2',
+          title: 'പാഠം 3.2: മൂന്നു വരികളും ചേർത്തുള്ള വാക്കുകൾ',
+          description: 'ഹോം, ടോപ്, ബോട്ടം വരികൾ സംയോജിപ്പിച്ചുള്ള പദങ്ങൾ',
+          targetText: 'മനസ്സ് സമയം ലോകം നഗരം സൂര്യൻ മലയാളം വചനം ജലം വയൽ കവിത സേവനം',
+          instructions: 'താഴത്തെ വരിയിലേക്ക് വിരലുകൾ നീട്ടുമ്പോൾ കൈപ്പത്തി ഒരുപാട് ചലിപ്പിക്കരുത്'
+        }
+      ]
+    },
+    {
+      id: 'lvl-4',
+      level: 4,
+      title: 'ലെവൽ 4: ഷിഫ്റ്റ് കീകൾ - സ്വരങ്ങളും മഹാപ്രാണങ്ങളും (Shift Layer)',
+      subtitle: 'Shift അമർത്തിപ്പിടിച്ച് ടൈപ്പ് ചെയ്യുന്ന സ്വതന്ത്ര സ്വരങ്ങളും അക്ഷരങ്ങളും',
+      stages: [
+        {
+          id: '4-1',
+          title: 'പാഠം 4.1: സ്വതന്ത്ര സ്വരങ്ങൾ (അ, ആ, ഇ, ഈ, ഉ, ഊ, എ, ഏ, ഐ, ഒ, ഓ, ഔ)',
+          description: 'Shift ഉപയോഗിച്ച് സ്വരങ്ങൾ ടൈപ്പ് ചെയ്യുക',
+          targetText: 'അ ആ ഇ ഈ ഉ ഊ എ ഏ ഐ ഒ ഓ ഔ അവര് ആകാശം ഇല ഈച്ച ഊണ് ഏട് ഐക്യം ഓട ഔഷധം',
+          instructions: 'Shift+D = അ | Shift+E = ആ | Shift+F = ഇ | Shift+R = ഈ | Shift+G = ഉ | Shift+T = ഊ'
+        },
+        {
+          id: '4-2',
+          title: 'പാഠം 4.2: മഹാപ്രാണാക്ഷരങ്ങൾ (ഖ, ഘ, ഛ, ഝ, ഠ, ഢ, ഥ, ധ, ഫ, ഭ)',
+          description: 'Shift ഉപയോഗിച്ച് കട്ടികൂടിയ അക്ഷരങ്ങൾ ടൈപ്പ് ചെയ്യുക',
+          targetText: 'ഖ ഘ ഛ ഝ ഠ ഢ ഥ ധ ഫ ഭ ഖരം ഘടകം ഫലം ഭാരതം ധനം കഥ ധർമ്മം',
+          instructions: 'Shift+K = ഖ | Shift+I = ഘ | Shift+H = ഫ | Shift+Y = ഭ | Shift+L = ഥ | Shift+O = ധ'
+        },
+        {
+          id: '4-3',
+          title: 'പാഠം 4.3: ശ, ഷ, ള, ഴ, റ, ണ, ങ, ഞ',
+          description: 'മറ്റു പ്രധാന ഷിഫ്റ്റ് അക്ഷരങ്ങൾ',
+          targetText: 'ശ ഷ ള ഴ റ ണ ങ ഞ ശാന്തി ഭാഷ മഴ കിളി റേഷൻ ഗണം മാങ്ങ ഞണ്ട്',
+          instructions: 'Shift+M = ശ | Shift+, = ഷ | Shift+N = ള | Shift+B = ഴ | Shift+J = റ | Shift+C = ണ'
+        }
+      ]
+    },
+    {
+      id: 'lvl-5',
+      level: 5,
+      title: 'ലെവൽ 5: ചില്ലക്ഷരങ്ങൾ (Chillu Characters)',
+      subtitle: 'ൺ, ൻ, ർ, ൽ, ൾ, ൿ രൂപപ്പെടുത്തുന്ന വിധം',
+      stages: [
+        {
+          id: '5-1',
+          title: 'പാഠം 5.1: ർ, ൽ, ൾ ചില്ലുകൾ',
+          description: 'അക്ഷരം + ചന്ദ്രക്കല (d) + ZWJ (]) = ചില്ല്',
+          targetText: 'ർ ൽ ൾ കാർ പാൽ വാൾ നീർ ചൊൽ ആൾ വേര് കാൽ ചോര ചൊല്ല്',
+          instructions: 'ർ = ര (j) + ് (d) + ZWJ (]) | ൽ = ല (n) + ് (d) + ZWJ (]) | ൾ = ള (Shift+N) + ് (d) + ZWJ (])'
+        },
+        {
+          id: '5-2',
+          title: 'പാഠം 5.2: ൻ, ൺ, ൿ ചില്ലുകൾ',
+          description: 'ൻ, ൺ, ൿ വാക്കുകൾ',
+          targetText: 'ൻ ൺ ൿ അവൻ കൺ വാക്ക് മിൻ പെൺ വൻ തേൻ മാൻ പൂൺ',
+          instructions: 'ൻ = ന (v) + ് (d) + ZWJ (]) | ൺ = ണ (Shift+C) + ് (d) + ZWJ (])'
+        }
+      ]
+    },
+    {
+      id: 'lvl-6',
+      level: 6,
+      title: 'ലെവൽ 6: കൂട്ടക്ഷരങ്ങൾ (Conjuncts)',
+      subtitle: 'ചന്ദ്രക്കല ഉപയോഗിച്ച് വ്യഞ്ജനങ്ങൾ ചേർത്തുള്ള കൂട്ടക്ഷരങ്ങൾ',
+      stages: [
+        {
+          id: '6-1',
+          title: 'പാഠം 6.1: ക്ഷ, ജ്ഞ, ത്ര, ശ്ര, പ്ര',
+          description: 'പ്രധാന സംയുക്താക്ഷരങ്ങൾ',
+          targetText: 'ക്ഷ ജ്ഞ ത്ര ശ്ര പ്ര ക്ഷമ ജ്ഞാനം ത്രയം ശ്രുതി പ്രകാശം പ്രണാമം പ്രതിഭ',
+          instructions: 'ക്ഷ = ക (k) + ് (d) + ഷ (Shift+,) | ജ്ഞ = ജ (p) + ് (d) + ഞ (Shift+]) | ത്ര = ത (l) + ് (d) + ര (j)'
+        },
+        {
+          id: '6-2',
+          title: 'പാഠം 6.2: ഇരട്ട അക്ഷരങ്ങൾ (ക്ക, ച്ച, ട്ട, ത്ത, പ്പ, റ്റ)',
+          description: 'ഒരു അക്ഷരം ഇരട്ടിക്കുന്നത് ചന്ദ്രക്കല വഴി',
+          targetText: 'ക്ക ച്ച ട്ട ത്ത പ്പ റ്റ പച്ച വട്ട തത്ത കപ്പ് കാറ്റ് അപ്പ പട്ട മച്ച',
+          instructions: 'ക്ക = ക + ് + ക | ച്ച = ച + ് + ച | ത്ത = ത + ് + ത | പ്പ = പ + ് + പ'
+        },
+        {
+          id: '6-3',
+          title: 'പാഠം 6.3: അനുനാസിക കൂട്ടക്ഷരങ്ങൾ (ങ്ങ, ഞ്ച, ണ്ട, ന്ത, മ്പ, മ്മ)',
+          description: 'അനുനാസികങ്ങൾ ചേർന്ന കൂട്ടക്ഷരങ്ങൾ',
+          targetText: 'ങ്ങ ഞ്ച ണ്ട ന്ത മ്പ മ്മ പന്ത കൊമ്പ അമ്മ ചന്ത കണ്ണ വണ്ടി മഞ്ച',
+          instructions: 'ന്ത = ന + ് + ത | മ്പ = മ + ് + പ | ണ്ട = ണ + ് + ട | ഞ്ച = ഞ + ് + ച'
+        }
+      ]
+    },
+    {
+      id: 'lvl-7',
+      level: 7,
+      title: 'ലെവൽ 7: വാക്യങ്ങളും വേഗതയും (Full Sentences & Speed)',
+      subtitle: 'പൂർണ്ണ വാക്യങ്ങളും നിത്യോപയോഗ രചനകളും വേഗത്തിൽ ടൈപ്പ് ചെയ്യുക',
+      stages: [
+        {
+          id: '7-1',
+          title: 'പാഠം 7.1: ലളിത വാക്യങ്ങൾ (Simple Sentences)',
+          description: 'പൂർണ്ണ വാക്യങ്ങൾ ടൈപ്പ് ചെയ്യുക',
+          targetText: 'നമസ്കാരം സുഹൃത്തേ. മലയാളം നമ്മുടെ മാതൃഭാഷയാണ്. കേരളം മനോഹരമായ നാടാണ്. വിദ്യ മനുഷ്യന് വെളിച്ചം നൽകുന്നു. നന്ദി ശുഭദിനം നേരുന്നു.',
+          instructions: 'വാക്കുകൾക്കിടയിൽ സ്പേസ് ബാർ കൃത്യമായി അടിച്ച് വിരാമചിഹ്നങ്ങളും ടൈപ്പ് ചെയ്യുക'
+        },
+        {
+          id: '7-2',
+          title: 'പാഠം 7.2: പ്രചോദനാത്മക വാക്യങ്ങൾ (Inspiring Quotes)',
+          description: 'സുഭാഷിതങ്ങളും ആപ്തവാക്യങ്ങളും',
+          targetText: 'വായിച്ചു വളരുക ചിന്തിച്ചു വിവേകം നേടുക. ഒരു ജാതി ഒരു മതം ഒരു ദൈവം മനുഷ്യന്. സത്യമേവ ജയതേ. അറിവാണ് യഥാർത്ഥ ശക്തി. സ്നേഹമാണ് ലോകത്തിന്റെ നിലനിൽപ്പ്.',
+          instructions: 'വേഗതയേക്കാൾ കൃത്യതയിൽ ശ്രദ്ധ കേന്ദ്രീകരിക്കുക'
+        }
+      ]
+    }
+  ];
+
+  class TutorEngine {
+    constructor(options = {}) {
+      this.storageKey = 'ml_tutor_progress';
+      this.currentStage = null;
+      this.targetText = '';
+      this.currentIndex = 0;
+
+      this.correctCount = 0;
+      this.errorCount = 0;
+      this.startTime = null;
+      this.endTime = null;
+      this.isActive = false;
+
+      this.onStateChange = options.onStateChange || (() => {});
+      this.onStageComplete = options.onStageComplete || (() => {});
+
+      this.charToKeyInfo = this.buildCharToKeyMap();
+      this.loadStage('1-1');
+    }
+
+    buildCharToKeyMap() {
+      const map = new Map();
+
+      Object.entries(INSCRIPT_MAP).forEach(([code, data]) => {
+        const finger = KEY_FINGER_MAP[code] || 'RI';
+
+        if (data.normal) {
+          map.set(data.normal, {
+            code,
+            keyName: data.keyName || '',
+            shift: false,
+            finger,
+            char: data.normal
+          });
+        }
+
+        if (data.shift) {
+          map.set(data.shift, {
+            code,
+            keyName: data.keyName || '',
+            shift: true,
+            finger,
+            char: data.shift
+          });
+        }
+      });
+
+      map.set(' ', {
+        code: 'Space',
+        keyName: 'Space',
+        shift: false,
+        finger: 'RT',
+        char: ' '
+      });
+
+      return map;
+    }
+
+    loadStage(stageId) {
+      let found = null;
+      for (const lvl of TUTOR_LEVELS) {
+        for (const stg of lvl.stages) {
+          if (stg.id === stageId) {
+            found = stg;
+            break;
+          }
+        }
+        if (found) break;
+      }
+
+      if (!found) {
+        found = TUTOR_LEVELS[0].stages[0];
+      }
+
+      this.currentStage = found;
+      this.targetText = found.targetText;
+      this.resetStats();
+      return this.currentStage;
+    }
+
+    resetStats() {
+      this.currentIndex = 0;
+      this.correctCount = 0;
+      this.errorCount = 0;
+      this.startTime = null;
+      this.endTime = null;
+      this.isActive = false;
+    }
+
+    start() {
+      this.resetStats();
+      this.startTime = Date.now();
+      this.isActive = true;
+      this.notify();
+    }
+
+    getCurrentChar() {
+      if (this.currentIndex >= this.targetText.length) return null;
+      return this.targetText[this.currentIndex];
+    }
+
+    getCurrentKeyGuide() {
+      const char = this.getCurrentChar();
+      if (!char) return null;
+
+      const info = this.charToKeyInfo.get(char);
+      if (!info) {
+        return {
+          char,
+          code: null,
+          keyName: char,
+          shift: false,
+          fingerCode: 'RT',
+          fingerMl: 'തള്ളവിരൽ',
+          fingerEn: 'Thumb'
+        };
+      }
+
+      const fingerObj = FINGER_NAMES[info.finger] || FINGER_NAMES.RI;
+
+      return {
+        char,
+        code: info.code,
+        keyName: info.keyName,
+        shift: info.shift,
+        fingerCode: info.finger,
+        fingerMl: fingerObj.ml,
+        fingerEn: fingerObj.en,
+        fingerColor: fingerObj.color
+      };
+    }
+
+    processKeyInput(typedChar) {
+      if (!this.isActive) {
+        this.start();
+      }
+
+      const expected = this.getCurrentChar();
+      if (!expected) return { finished: true };
+
+      if (typedChar === expected) {
+        this.correctCount++;
+        this.currentIndex++;
+
+        const isCompleted = this.currentIndex >= this.targetText.length;
+        if (isCompleted) {
+          this.endTime = Date.now();
+          this.isActive = false;
+          const finalMetrics = this.getMetrics();
+          this.saveStageProgress(this.currentStage.id, finalMetrics);
+          this.onStageComplete(this.currentStage, finalMetrics);
+        }
+
+        this.notify();
+        return {
+          correct: true,
+          finished: isCompleted,
+          nextGuide: this.getCurrentKeyGuide()
+        };
+      } else {
+        this.errorCount++;
+        this.notify();
+        return {
+          correct: false,
+          finished: false,
+          nextGuide: this.getCurrentKeyGuide()
+        };
+      }
+    }
+
+    backspace() {
+      if (!this.isActive || this.currentIndex <= 0) return;
+      this.currentIndex--;
+      this.notify();
+    }
+
+    getMetrics() {
+      const elapsedMinutes = (Math.max(Date.now(), this.endTime || Date.now()) - (this.startTime || Date.now())) / 60000;
+      const totalTyped = this.correctCount + this.errorCount;
+      const accuracy = totalTyped > 0 ? Math.round((this.correctCount / totalTyped) * 100) : 100;
+      const wordsTyped = this.correctCount / 4;
+      const wpm = elapsedMinutes > 0 ? Math.round(wordsTyped / elapsedMinutes) : 0;
+      const progress = this.targetText.length > 0 ? Math.round((this.currentIndex / this.targetText.length) * 100) : 0;
+
+      let stars = 1;
+      if (accuracy >= 95 && wpm >= 15) {
+        stars = 3;
+      } else if (accuracy >= 85) {
+        stars = 2;
+      }
+
+      return {
+        progress,
+        accuracy,
+        wpm,
+        correct: this.correctCount,
+        errors: this.errorCount,
+        stars,
+        completed: this.currentIndex >= this.targetText.length
+      };
+    }
+
+    notify() {
+      this.onStateChange({
+        stage: this.currentStage,
+        metrics: this.getMetrics(),
+        guide: this.getCurrentKeyGuide(),
+        currentIndex: this.currentIndex,
+        targetText: this.targetText
+      });
+    }
+
+    saveStageProgress(stageId, metrics) {
+      try {
+        const data = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+        const existing = data[stageId] || { stars: 0, wpm: 0, accuracy: 0 };
+
+        data[stageId] = {
+          stars: Math.max(existing.stars, metrics.stars),
+          wpm: Math.max(existing.wpm, metrics.wpm),
+          accuracy: Math.max(existing.accuracy, metrics.accuracy),
+          completedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem(this.storageKey, JSON.stringify(data));
+      } catch {}
+    }
+
+    getStageSavedData(stageId) {
+      try {
+        const data = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+        return data[stageId] || null;
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  /* =========================================================
+     9. Main Malayalam Typing Application
      ========================================================= */
   class MalayalamTypingApp {
     constructor() {
@@ -1304,6 +1878,33 @@
       this.speedTestDuration = 1; // 1, 2, 3, 4, 5 mins
       this.speedSession = null;
       this.lastSpeedMetrics = null;
+
+      // Tutor elements
+      this.practiceModal = document.getElementById('practiceModal');
+      this.practiceStageSelect = document.getElementById('practiceStageSelect');
+      this.practiceTargetStream = document.getElementById('practiceTargetStream');
+      this.tutorFingerGuideCard = document.getElementById('tutorFingerGuideCard');
+      this.tutorCompletionCard = document.getElementById('tutorCompletionCard');
+      this.tutorEngine = null;
+
+      this.speedTestModal = document.getElementById('speedTestModal');
+      this.speedTestInput = document.getElementById('speedTestInput');
+      this.speedWordsContainer = document.getElementById('speedWordsContainer');
+      this.speedTimerEl = document.getElementById('speedTestTimer');
+      this.speedResultsCard = document.getElementById('speedTestResultsCard');
+      this.speedActiveArea = document.getElementById('speedTestActiveArea');
+      this.speedConfigRow = document.getElementById('speedTestConfigRow');
+      this.speedTestDuration = 1; // 1, 2, 3, 4, 5 mins
+      this.speedSession = null;
+      this.lastSpeedMetrics = null;
+
+      // Tutor elements
+      this.practiceModal = document.getElementById('practiceModal');
+      this.practiceStageSelect = document.getElementById('practiceStageSelect');
+      this.practiceTargetStream = document.getElementById('practiceTargetStream');
+      this.tutorFingerGuideCard = document.getElementById('tutorFingerGuideCard');
+      this.tutorCompletionCard = document.getElementById('tutorCompletionCard');
+      this.tutorEngine = null;
 
       this.storage = {
         get: (k, def = null) => {
@@ -1333,9 +1934,22 @@
         autoNormalizeChillus: true
       });
 
+      this.tutorEngine = new TutorEngine({
+        onStateChange: (state) => this.onTutorStateChanged(state),
+        onStageComplete: (stage, metrics) => this.onTutorStageCompleted(stage, metrics)
+      });
+
       this.keyboard = new VirtualKeyboard(this.keyboardContainer, this.editor, {
         physicalKeyboardEnabled: this.inputMode === 'physical',
+        isTutorActive: () => this.isTutorOpen(),
+        isSpeedActive: () => this.isSpeedTestOpen(),
         getActiveTarget: () => {
+          if (this.isTutorOpen()) {
+            return {
+              insertText: (ch) => this.handleTutorKeyInput(ch),
+              smartBackspace: () => this.handleTutorBackspace()
+            };
+          }
           if (this.isSpeedTestOpen()) {
             return {
               insertText: (ch) => this.handleSpeedKeyInput(ch),
@@ -1518,6 +2132,92 @@
       if (printBtn) {
         printBtn.addEventListener('click', () => {
           window.print();
+        });
+      }
+
+      // Tutor Listeners
+      const practiceBtn = document.getElementById('practiceBtn');
+      const closePracticeBtn = document.getElementById('closePracticeBtn');
+      if (practiceBtn) {
+        practiceBtn.addEventListener('click', () => this.openTutorModal());
+      }
+      if (closePracticeBtn) {
+        closePracticeBtn.addEventListener('click', () => this.closeTutorModal());
+      }
+      if (this.practiceModal) {
+        this.practiceModal.addEventListener('click', (e) => {
+          if (e.target === this.practiceModal) {
+            this.closeTutorModal();
+          }
+        });
+      }
+
+      if (this.practiceStageSelect) {
+        this.practiceStageSelect.addEventListener('change', (e) => {
+          if (this.tutorEngine) {
+            this.tutorEngine.loadStage(e.target.value);
+            this.startTutor();
+          }
+        });
+      }
+
+      const startPracticeBtn = document.getElementById('startPracticeBtn');
+      if (startPracticeBtn) {
+        startPracticeBtn.addEventListener('click', () => this.startTutor());
+      }
+
+      const resetTutorBtn = document.getElementById('resetTutorBtn');
+      if (resetTutorBtn) {
+        resetTutorBtn.addEventListener('click', () => this.startTutor());
+      }
+
+      const restartPracticeBtn = document.getElementById('restartPracticeBtn');
+      if (restartPracticeBtn) {
+        restartPracticeBtn.addEventListener('click', () => this.startTutor());
+      }
+
+      const nextStageBtn = document.getElementById('nextStageBtn');
+      if (nextStageBtn) {
+        nextStageBtn.addEventListener('click', () => this.loadNextTutorStage());
+      }
+
+      // Voice Typing
+      const voiceBtn = document.getElementById('voiceBtn');
+      if (voiceBtn) {
+        this.speechEngine = new MalayalamSpeechEngine({
+          onResult: (text) => {
+            this.editor.insertText(' ' + text);
+            feedback.feedback(false);
+          },
+          onStatusChange: (listening) => {
+            if (listening) {
+              voiceBtn.classList.add('recording');
+              voiceBtn.innerHTML = '<span class="icon">🛑</span> <span>കേൾക്കുന്നു...</span>';
+              this.showToast('ശബ്ദം കേൾക്കുന്നു... സംസാരിക്കുക (Listening...)');
+            } else {
+              voiceBtn.classList.remove('recording');
+              voiceBtn.innerHTML = '<span class="icon">🎙️</span> <span>വോയ്‌സ്</span>';
+            }
+          }
+        });
+
+        voiceBtn.addEventListener('click', () => {
+          this.speechEngine.toggle();
+          feedback.feedback(true);
+        });
+      }
+
+      // Keyboard Size
+      const kbSizeSelect = document.getElementById('kbSizeSelect');
+      if (kbSizeSelect) {
+        kbSizeSelect.addEventListener('change', (e) => {
+          const size = e.target.value;
+          const kbWrap = this.keyboardContainer.querySelector('.keyboard-wrapper');
+          if (kbWrap) {
+            kbWrap.classList.remove('size-compact', 'size-large');
+            if (size === 'compact') kbWrap.classList.add('size-compact');
+            if (size === 'large') kbWrap.classList.add('size-large');
+          }
         });
       }
 
@@ -1793,6 +2493,445 @@
       } else {
         this.copyToClipboard();
         this.showToast('ഷെയർ സാധ്യമല്ല, ടെക്സ്റ്റ് ക്ലിപ്പ്ബോർഡിലേക്ക് കോപ്പി ചെയ്തു');
+      }
+    }
+
+    // ==========================================
+    // InScript Master Tutor Methods
+    // ==========================================
+    openTutorModal() {
+      if (!this.practiceModal) return;
+      this.practiceModal.classList.remove('hidden');
+      if (this.tutorCompletionCard) this.tutorCompletionCard.classList.add('hidden');
+      if (this.tutorFingerGuideCard) this.tutorFingerGuideCard.classList.remove('hidden');
+
+      // Dock virtual keyboard directly into tutor modal so it is fully visible and touchable
+      const kb = document.getElementById('virtualKeyboard');
+      const dock = document.getElementById('tutorKeyboardDock');
+      if (kb && dock) {
+        dock.appendChild(kb);
+      }
+
+      this.startTutor();
+    }
+
+    closeTutorModal() {
+      if (!this.practiceModal) return;
+      this.practiceModal.classList.add('hidden');
+
+      // Return virtual keyboard to main page layout
+      const kb = document.getElementById('virtualKeyboard');
+      const mainSlot = document.getElementById('mainKeyboardSlot');
+      if (kb && mainSlot) {
+        mainSlot.appendChild(kb);
+      }
+
+      if (this.keyboard) {
+        this.keyboard.clearTutorHighlights();
+      }
+      if (this.tutorEngine) {
+        this.tutorEngine.resetStats();
+      }
+    }
+
+    isTutorOpen() {
+      return this.practiceModal && !this.practiceModal.classList.contains('hidden');
+    }
+
+    startTutor() {
+      if (!this.tutorEngine) return;
+      if (this.tutorCompletionCard) this.tutorCompletionCard.classList.add('hidden');
+      if (this.tutorFingerGuideCard) this.tutorFingerGuideCard.classList.remove('hidden');
+
+      this.tutorEngine.start();
+      this.renderTutorStars();
+    }
+
+    handleTutorKeyInput(char) {
+      if (!this.tutorEngine || !this.tutorEngine.isActive) {
+        this.startTutor();
+      }
+      const res = this.tutorEngine.processKeyInput(char);
+      if (res && res.correct) {
+        feedback.feedback(false);
+      } else {
+        feedback.feedback(true);
+        const currentEl = this.practiceTargetStream ? this.practiceTargetStream.querySelector('.char-current') : null;
+        if (currentEl) {
+          currentEl.classList.add('char-error-shake');
+          setTimeout(() => currentEl.classList.remove('char-error-shake'), 250);
+        }
+      }
+    }
+
+    handleTutorBackspace() {
+      if (!this.tutorEngine || !this.tutorEngine.isActive) return;
+      this.tutorEngine.backspace();
+      feedback.feedback(true);
+    }
+
+    onTutorStateChanged(state) {
+      this.renderTutorStream(state.targetText, state.currentIndex);
+      this.updateTutorGuide(state.guide);
+
+      if (this.keyboard && state.guide) {
+        this.keyboard.highlightTutorKey(state.guide.code, state.guide.shift);
+      }
+
+      this.updateTutorMetrics(state.metrics);
+    }
+
+    renderTutorStream(targetText, currentIndex) {
+      if (!this.practiceTargetStream) return;
+      const html = [];
+
+      for (let i = 0; i < targetText.length; i++) {
+        const ch = targetText[i];
+        const displayChar = ch === ' ' ? '␣' : ch;
+        if (i < currentIndex) {
+          html.push(`<span class="char-done">${displayChar}</span>`);
+        } else if (i === currentIndex) {
+          html.push(`<span class="char-current">${displayChar}</span>`);
+        } else {
+          html.push(`<span class="char-upcoming">${displayChar}</span>`);
+        }
+      }
+
+      this.practiceTargetStream.innerHTML = html.join('');
+
+      const currentEl = this.practiceTargetStream.querySelector('.char-current');
+      if (currentEl) {
+        currentEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    updateTutorGuide(guide) {
+      if (!guide) return;
+      const targetCharEl = document.getElementById('guideTargetChar');
+      const targetNameEl = document.getElementById('guideTargetName');
+      const fingerDot = document.getElementById('guideFingerDot');
+      const fingerName = document.getElementById('guideFingerName');
+      const keyName = document.getElementById('guideKeyName');
+      const shiftReq = document.getElementById('guideShiftReq');
+      const guideDesc = document.getElementById('guideDescription');
+
+      if (targetCharEl) targetCharEl.textContent = guide.char === ' ' ? '␣ (Space)' : guide.char;
+      if (targetNameEl) targetNameEl.textContent = `അക്ഷരം: ${guide.char === ' ' ? 'സ്പേസ്' : guide.char}`;
+
+      if (fingerDot && guide.fingerColor) fingerDot.style.background = guide.fingerColor;
+      if (fingerName) fingerName.textContent = `${guide.fingerMl} (${guide.fingerEn})`;
+
+      if (keyName) keyName.textContent = guide.keyName ? `Key ${guide.keyName}` : 'Spacebar';
+
+      if (shiftReq) {
+        if (guide.shift) {
+          shiftReq.textContent = '⇧ Shift അമർത്തിപ്പിടിക്കുക';
+          shiftReq.style.color = '#f59e0b';
+        } else {
+          shiftReq.textContent = 'നേരിട്ട് അമർത്തുക (Normal)';
+          shiftReq.style.color = 'var(--text-muted)';
+        }
+      }
+
+      if (guideDesc && this.tutorEngine && this.tutorEngine.currentStage) {
+        guideDesc.textContent = this.tutorEngine.currentStage.instructions || '';
+      }
+    }
+
+    updateTutorMetrics(metrics) {
+      const progEl = document.getElementById('practiceProgress');
+      const accEl = document.getElementById('practiceAccuracy');
+      const wpmEl = document.getElementById('practiceWpm');
+      const errEl = document.getElementById('practiceErrors');
+
+      if (progEl) progEl.textContent = `${metrics.progress}%`;
+      if (accEl) accEl.textContent = `${metrics.accuracy}%`;
+      if (wpmEl) wpmEl.textContent = metrics.wpm;
+      if (errEl) errEl.textContent = metrics.errors;
+    }
+
+    renderTutorStars() {
+      const starsEl = document.getElementById('stageStarsDisplay');
+      if (!starsEl || !this.tutorEngine || !this.tutorEngine.currentStage) return;
+
+      const saved = this.tutorEngine.getStageSavedData(this.tutorEngine.currentStage.id);
+      if (saved && saved.stars > 0) {
+        starsEl.textContent = '⭐'.repeat(saved.stars);
+      } else {
+        starsEl.textContent = '☆☆☆';
+      }
+    }
+
+    onTutorStageCompleted(stage, metrics) {
+      if (this.keyboard) {
+        this.keyboard.clearTutorHighlights();
+      }
+
+      if (this.tutorFingerGuideCard) this.tutorFingerGuideCard.classList.add('hidden');
+      if (this.tutorCompletionCard) this.tutorCompletionCard.classList.remove('hidden');
+
+      const titleEl = document.getElementById('completionTitle');
+      const starsEl = document.getElementById('completionStars');
+      const summaryEl = document.getElementById('completionSummary');
+
+      if (titleEl) titleEl.textContent = `അഭിനന്ദനങ്ങൾ! ${stage.title} പൂർത്തിയായി!`;
+      if (starsEl) starsEl.textContent = '⭐'.repeat(metrics.stars);
+      if (summaryEl) {
+        summaryEl.textContent = `കൃത്യത: ${metrics.accuracy}% | വേഗത: ${metrics.wpm} WPM | തെറ്റുകൾ: ${metrics.errors}`;
+      }
+
+      this.renderTutorStars();
+      feedback.feedback(true);
+      this.showToast(`പാഠം പൂർത്തിയായി! ⭐ x ${metrics.stars}`);
+    }
+
+    loadNextTutorStage() {
+      if (!this.tutorEngine || !this.tutorEngine.currentStage) return;
+      const currentId = this.tutorEngine.currentStage.id;
+
+      const allStageIds = [];
+      TUTOR_LEVELS.forEach(lvl => lvl.stages.forEach(s => allStageIds.push(s.id)));
+
+      const currentIdx = allStageIds.indexOf(currentId);
+      if (currentIdx >= 0 && currentIdx < allStageIds.length - 1) {
+        const nextId = allStageIds[currentIdx + 1];
+        if (this.practiceStageSelect) {
+          this.practiceStageSelect.value = nextId;
+        }
+        this.tutorEngine.loadStage(nextId);
+        this.startTutor();
+      } else {
+        this.showToast('എല്ലാ പാഠങ്ങളും പൂർത്തിയായി! നിങ്ങൾ ഇൻസ്ക്രിപ്റ്റ് മാസ്റ്ററായി!');
+        this.closeTutorModal();
+      }
+    }
+
+    // ==========================================
+    // Speed Test Methods
+    // ==========================================
+    openSpeedTestModal() {
+      if (!this.speedTestModal) return;
+      this.speedTestModal.classList.remove('hidden');
+      this.prepareSpeedTest();
+    }
+
+    closeSpeedTestModal() {
+      if (!this.speedTestModal) return;
+      this.speedTestModal.classList.add('hidden');
+      if (this.speedSession) {
+        this.speedSession.stop();
+      }
+    }
+
+    isSpeedTestOpen() {
+      return this.speedTestModal && !this.speedTestModal.classList.contains('hidden');
+    }
+
+    prepareSpeedTest() {
+      if (this.speedSession) {
+        this.speedSession.stop();
+      }
+      this.speedSession = new SpeedTestSession(this.speedTestDuration);
+      this.lastSpeedMetrics = null;
+
+      if (this.speedTestResultsCard) this.speedTestResultsCard.classList.add('hidden');
+      if (this.speedActiveArea) this.speedActiveArea.classList.remove('hidden');
+      if (this.speedConfigRow) this.speedConfigRow.classList.remove('hidden');
+
+      const startBtn = document.getElementById('startSpeedTestBtn');
+      if (startBtn) startBtn.style.display = 'inline-flex';
+
+      if (this.speedTestInput) {
+        this.speedTestInput.value = '';
+        this.speedTestInput.disabled = true;
+        this.speedTestInput.placeholder = 'ടെസ്റ്റ് ആരംഭിക്കാൻ "ടെസ്റ്റ് ആരംഭിക്കുക" അമർത്തുക...';
+      }
+
+      this.renderSpeedWords();
+      this.updateLiveSpeedTimer(this.speedSession.durationSeconds);
+      this.resetLiveSpeedMetrics();
+    }
+
+    startSpeedTest() {
+      if (!this.speedSession) {
+        this.prepareSpeedTest();
+      }
+
+      if (this.speedTestInput) {
+        this.speedTestInput.disabled = false;
+        this.speedTestInput.value = '';
+        this.speedTestInput.placeholder = 'മുകളിലെ വാക്ക് കണ്ട് സ്പേസ് ബാർ അടിച്ച് ടൈപ്പ് ചെയ്യുക...';
+        this.speedTestInput.focus();
+        if (this.inputMode === 'touch') {
+          this.speedTestInput.setAttribute('inputmode', 'none');
+        }
+      }
+
+      const startBtn = document.getElementById('startSpeedTestBtn');
+      if (startBtn) startBtn.style.display = 'none';
+
+      this.speedSession.start(
+        (remainingSeconds, metrics) => {
+          this.updateLiveSpeedTimer(remainingSeconds);
+          this.updateLiveSpeedMetrics(metrics);
+        },
+        (finalMetrics) => {
+          this.showSpeedResults(finalMetrics);
+        }
+      );
+    }
+
+    handleSpeedKeyInput(char) {
+      if (!this.speedSession || !this.speedSession.isActive || !this.speedTestInput) return;
+
+      if (char === ' ') {
+        this.submitCurrentSpeedWord();
+      } else {
+        this.speedTestInput.value += char;
+        this.speedSession.currentInput = this.speedTestInput.value;
+      }
+    }
+
+    handleSpeedBackspace() {
+      if (!this.speedTestInput) return;
+      const val = this.speedTestInput.value;
+      if (val.length > 0) {
+        let newLen = val.length - 1;
+        if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+          try {
+            const seg = new Intl.Segmenter('ml', { granularity: 'grapheme' });
+            const segments = Array.from(seg.segment(val));
+            if (segments.length > 0) {
+              const last = segments[segments.length - 1];
+              newLen = last.index;
+            }
+          } catch {}
+        }
+        this.speedTestInput.value = val.slice(0, newLen);
+        if (this.speedSession) this.speedSession.currentInput = this.speedTestInput.value;
+      }
+    }
+
+    submitCurrentSpeedWord() {
+      if (!this.speedSession || !this.speedTestInput) return;
+      const typed = this.speedTestInput.value.trim();
+      if (!typed) return;
+
+      this.speedSession.submitWord(typed);
+      this.speedTestInput.value = '';
+      this.renderSpeedWords();
+      const metrics = this.speedSession.getMetrics();
+      this.updateLiveSpeedMetrics(metrics);
+      feedback.feedback(false);
+    }
+
+    renderSpeedWords() {
+      if (!this.speedWordsContainer || !this.speedSession) return;
+      const words = this.speedSession.words;
+      const currentIndex = this.speedSession.currentWordIndex;
+      const results = this.speedSession.wordResults;
+
+      const html = words.map((w, idx) => {
+        let cls = 'speed-word';
+        if (idx === currentIndex) {
+          cls += ' active';
+        } else if (idx < currentIndex) {
+          const res = results[idx];
+          if (res && res.correct) {
+            cls += ' correct';
+          } else {
+            cls += ' incorrect';
+          }
+        }
+        return `<span class="${cls}" data-idx="${idx}">${w}</span>`;
+      }).join(' ');
+
+      this.speedWordsContainer.innerHTML = html;
+
+      const activeWordEl = this.speedWordsContainer.querySelector('.speed-word.active');
+      if (activeWordEl) {
+        activeWordEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    updateLiveSpeedTimer(seconds) {
+      if (!this.speedTimerEl) return;
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      this.speedTimerEl.textContent = formatted;
+
+      if (seconds <= 10) {
+        this.speedTimerEl.classList.add('warning');
+      } else {
+        this.speedTimerEl.classList.remove('warning');
+      }
+    }
+
+    updateLiveSpeedMetrics(metrics) {
+      const netWpmEl = document.getElementById('liveNetWpm');
+      const accuracyEl = document.getElementById('liveAccuracy');
+      const correctWordsEl = document.getElementById('liveCorrectWords');
+
+      if (netWpmEl) netWpmEl.textContent = metrics.netWpm;
+      if (accuracyEl) accuracyEl.textContent = `${metrics.accuracy}%`;
+      if (correctWordsEl) correctWordsEl.textContent = metrics.correctWords;
+    }
+
+    resetLiveSpeedMetrics() {
+      this.updateLiveSpeedMetrics({ netWpm: 0, accuracy: 100, correctWords: 0 });
+    }
+
+    showSpeedResults(metrics) {
+      this.lastSpeedMetrics = metrics;
+
+      if (this.speedActiveArea) this.speedActiveArea.classList.add('hidden');
+      if (this.speedConfigRow) this.speedConfigRow.classList.add('hidden');
+      if (this.speedTestResultsCard) this.speedTestResultsCard.classList.remove('hidden');
+
+      const rankBadge = document.getElementById('resultRankBadge');
+      const rankTitle = document.getElementById('resultRankTitle');
+      const resultNetWpm = document.getElementById('resultNetWpm');
+      const resultAccuracy = document.getElementById('resultAccuracy');
+      const resultGrossWpm = document.getElementById('resultGrossWpm');
+      const resultCorrectWords = document.getElementById('resultCorrectWords');
+      const resultIncorrectWords = document.getElementById('resultIncorrectWords');
+      const resultTotalChars = document.getElementById('resultTotalChars');
+
+      if (rankBadge) rankBadge.textContent = metrics.badge;
+      if (rankTitle) rankTitle.textContent = metrics.rank;
+      if (resultNetWpm) resultNetWpm.textContent = metrics.netWpm;
+      if (resultAccuracy) resultAccuracy.textContent = `${metrics.accuracy}%`;
+      if (resultGrossWpm) resultGrossWpm.textContent = metrics.grossWpm;
+      if (resultCorrectWords) resultCorrectWords.textContent = metrics.correctWords;
+      if (resultIncorrectWords) resultIncorrectWords.textContent = metrics.incorrectWords;
+      if (resultTotalChars) resultTotalChars.textContent = metrics.totalChars;
+
+      feedback.feedback(true);
+      this.showToast(`ടെസ്റ്റ് പൂർത്തിയായി! നിങ്ങളുടെ വേഗത: ${metrics.netWpm} WPM`);
+    }
+
+    copySpeedResultCard() {
+      if (!this.lastSpeedMetrics) return;
+      const m = this.lastSpeedMetrics;
+      const text = `⚡ മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് ⚡
+-----------------------------------------
+🏆 റാങ്ക്: ${m.badge} ${m.rank}
+⚡ നെറ്റ് സ്പീഡ്: ${m.netWpm} WPM
+🎯 കൃത്യത: ${m.accuracy}%
+⌨️ ഗ്രോസ് സ്പീഡ്: ${m.grossWpm} WPM
+✅ ശരിയായ വാക്കുകൾ: ${m.correctWords}
+❌ തെറ്റായ വാക്കുകൾ: ${m.incorrectWords}
+⏱️ സമയം: ${this.speedTestDuration} മിനിറ്റ്
+-----------------------------------------
+മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ഇന്റർഫേസ് ഉപയോഗിച്ച് പരീക്ഷിച്ച ഫലം`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          this.showToast('സ്പീഡ് ടെസ്റ്റ് സ്കോർ കാർഡ് കോപ്പി ചെയ്തു! (Copied)');
+        });
+      } else {
+        this.fallbackCopy(text);
       }
     }
 

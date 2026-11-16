@@ -117,8 +117,74 @@ import('./src/speed-test.js').then(({ SpeedTestSession, MALAYALAM_SPEED_PASSAGES
 
   console.log('✓ Speed Test Engine verified successfully.');
 
-  console.log('\n=======================================');
-  console.log('ALL TESTS PASSED! ENGINE IS 100% SOUND.');
-  console.log('=======================================');
+  // 5. Verify InScript Tutor Engine
+  console.log('Test 5: Testing InScript Master Tutor Engine...');
+  Promise.all([
+    import('./src/tutor-curriculum.js'),
+    import('./src/tutor-engine.js')
+  ]).then(([{ TUTOR_LEVELS, FINGER_NAMES }, { TutorEngine }]) => {
+    assert.strictEqual(TUTOR_LEVELS.length, 7, 'Should have 7 curriculum levels');
+    assert.ok(Object.keys(FINGER_NAMES).length >= 10, 'Should have 10 finger definitions');
+
+    const tutor = new TutorEngine();
+    assert.strictEqual(tutor.currentStage.id, '1-1', 'Default stage should be 1-1');
+
+    const guide = tutor.getCurrentKeyGuide();
+    assert.ok(guide, 'Should provide key guide for first char');
+    assert.ok(guide.code, 'Should have physical keycode');
+    assert.ok(guide.fingerMl, 'Should have finger name in Malayalam');
+
+    // Test correct key processing
+    const expectedChar = tutor.getCurrentChar();
+    const res = tutor.processKeyInput(expectedChar);
+    assert.strictEqual(res.correct, true, 'Matching input should be recorded as correct');
+    assert.strictEqual(tutor.currentIndex, 1, 'Index should advance by 1');
+
+    // Test wrong key processing
+    const res2 = tutor.processKeyInput('ഏ');
+    assert.strictEqual(res2.correct, false, 'Non-matching input should be recorded as error');
+    assert.strictEqual(tutor.errorCount, 1, 'Error count should be 1');
+
+    console.log('✓ InScript Master Tutor Engine verified successfully.');
+
+    // 6. Verify Production bundle.js Syntax & Evaluation
+    console.log('Test 6: Verifying production bundle.js syntax and DOM ID parity...');
+    import('node:fs').then(({ default: fs }) => {
+      const bundleCode = fs.readFileSync('src/bundle.js', 'utf8');
+      const htmlCode = fs.readFileSync('index.html', 'utf8');
+
+      // Verify no duplicate const/let declarations on critical variables
+      assert.strictEqual(
+        (bundleCode.match(/const MALAYALAM_SPEED_PASSAGES/g) || []).length,
+        1,
+        'MALAYALAM_SPEED_PASSAGES should be declared exactly once'
+      );
+      assert.strictEqual(
+        (bundleCode.match(/class SpeedTestSession/g) || []).length,
+        1,
+        'SpeedTestSession should be declared exactly once'
+      );
+      assert.strictEqual(
+        (bundleCode.match(/class MalayalamTypingApp/g) || []).length,
+        1,
+        'MalayalamTypingApp should be declared exactly once'
+      );
+
+      // Verify all getElementById calls have matches in index.html
+      const idMatches = [...bundleCode.matchAll(/getElementById\(['"]([^'"]+)['"]\)/g)];
+      const ids = new Set(idMatches.map(m => m[1]));
+      for (const id of ids) {
+        assert.ok(
+          htmlCode.includes('id="' + id + '"') || htmlCode.includes("id='" + id + "'"),
+          `Missing ID in index.html: ${id}`
+        );
+      }
+      console.log(`✓ bundle.js parity verified across ${ids.size} DOM element IDs.`);
+
+      console.log('\n=======================================');
+      console.log('ALL TESTS PASSED! ENGINE IS 100% SOUND.');
+      console.log('=======================================');
+    });
+  });
 });
 

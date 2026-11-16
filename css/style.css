@@ -1252,4 +1252,432 @@ textarea.ml-textarea::placeholder {
   }
 }
 
+/* =========================================================
+   Voice Typing, Keyboard Sizing & Practice Mode Styles
+   ========================================================= */
+.btn-voice.recording {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  animation: pulse-red 1.2s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+/* Keyboard Size Customization */
+.keyboard-wrapper.size-compact .kb-key {
+  height: 40px;
+}
+.keyboard-wrapper.size-compact .primary-char,
+.keyboard-wrapper.size-compact .shift-char {
+  font-size: 1.05rem;
+}
+
+.keyboard-wrapper.size-large .kb-key {
+  height: 64px;
+}
+.keyboard-wrapper.size-large .primary-char,
+.keyboard-wrapper.size-large .shift-char {
+  font-size: 1.45rem;
+}
+
+/* Interactive Practice Key Glowing Target */
+.kb-key.practice-target {
+  border-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.25) !important;
+  box-shadow: 0 0 12px #f59e0b !important;
+  animation: target-glow 1s infinite alternate;
+}
+
+@keyframes target-glow {
+  0% { transform: scale(1); box-shadow: 0 0 6px #f59e0b; }
+  100% { transform: scale(1.04); box-shadow: 0 0 16px #f59e0b; }
+}
+
+/* Practice Modal Styles */
+.practice-modal-content {
+  max-width: 720px;
+}
+
+.practice-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.practice-display-card {
+  background: var(--bg-editor);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.practice-text-target {
+  font-family: var(--font-malayalam);
+  font-size: 1.4rem;
+  line-height: 1.8;
+  letter-spacing: 1px;
+}
+
+.practice-text-target .char-done {
+  color: var(--success-color);
+}
+
+.practice-text-target .char-current {
+  background: rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  border-bottom: 3px solid #f59e0b;
+  border-radius: 2px;
+  font-weight: 700;
+}
+
+.practice-current-indicator {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.highlight-char {
+  font-family: var(--font-malayalam);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f59e0b;
+  padding: 0 4px;
+}
+
+.practice-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.metric-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-accent);
+}
+
+.practice-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* =========================================================
+   InScript Master Tutor Dedicated Styles
+   ========================================================= */
+.tutor-modal-layout {
+  max-width: 980px;
+  width: 95vw;
+}
+
+.tutor-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tutor-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tutor-nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-tertiary);
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tutor-select-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.tutor-stage-select {
+  flex: 1;
+  max-width: 480px;
+  font-weight: 600;
+}
+
+.stage-stars-display {
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+
+/* Dynamic Finger Guidance Card */
+.tutor-finger-guide-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.target-char-display-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  height: 90px;
+  background: var(--bg-editor);
+  border: 2px solid #f59e0b;
+  border-radius: 14px;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+}
+
+.guide-target-char {
+  font-family: var(--font-malayalam);
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #f59e0b;
+  line-height: 1;
+}
+
+.guide-target-name {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.finger-instructions-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.instruction-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.instr-label {
+  color: var(--text-muted);
+  font-weight: 500;
+  min-width: 130px;
+}
+
+.finger-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-tertiary);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.finger-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.key-pill {
+  background: var(--primary-btn-bg);
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.shift-requirement-pill {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.instruction-row.hint-desc {
+  font-size: 0.82rem;
+  color: var(--text-accent);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* Streaming Target Text */
+.tutor-display-card {
+  background: var(--bg-editor);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-height: 100px;
+  max-height: 160px;
+  overflow-y: auto;
+  user-select: none;
+}
+
+.tutor-text-stream {
+  font-family: var(--font-malayalam);
+  font-size: 1.6rem;
+  line-height: 2;
+  letter-spacing: 2px;
+  word-break: break-all;
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
+}
+
+.tutor-text-stream span.char-done {
+  color: var(--success-color);
+}
+
+.tutor-text-stream span.char-current {
+  background: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+  border-bottom: 3px solid #f59e0b;
+  border-radius: 4px;
+  font-weight: 800;
+  padding: 0 4px;
+  animation: char-pulse 0.8s infinite alternate;
+}
+
+@keyframes char-pulse {
+  0% { background: rgba(245, 158, 11, 0.2); }
+  100% { background: rgba(245, 158, 11, 0.5); }
+}
+
+.tutor-text-stream span.char-upcoming {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* Completion Card */
+.tutor-completion-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(2, 132, 199, 0.15));
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.completion-icon {
+  font-size: 3rem;
+}
+
+.completion-stars {
+  font-size: 2rem;
+  letter-spacing: 4px;
+}
+
+.completion-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* In-Modal Virtual Keyboard Dock */
+.tutor-keyboard-dock-wrapper {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tutor-keyboard-dock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.tutor-keyboard-dock-header .dock-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tutor-keyboard-dock-header .dock-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.tutor-keyboard-dock .keyboard-section {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tutor-keyboard-dock .keyboard-wrapper {
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Character Error Shake Animation */
+.char-error-shake {
+  animation: charShake 0.25s ease-in-out !important;
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-radius: 4px;
+}
+
+@keyframes charShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+
+
+
 
