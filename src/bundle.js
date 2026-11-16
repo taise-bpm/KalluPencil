@@ -126,6 +126,31 @@
     { char: '\u0D3D', label: 'ഽ (അവഗ്രഹം)', desc: 'Avagraha' }
   ];
 
+  const FINGER_NAMES = {
+    LP: { en: 'Left Pinky', ml: 'ഇടതു കൈ ചെറുവിരൽ', color: '#ec4899' },
+    LR: { en: 'Left Ring', ml: 'ഇടതു കൈ മോതിരവിരൽ', color: '#8b5cf6' },
+    LM: { en: 'Left Middle', ml: 'ഇടതു കൈ നടുവിരൽ', color: '#3b82f6' },
+    LI: { en: 'Left Index', ml: 'ഇടതു കൈ ചൂണ്ടുവിരൽ', color: '#10b981' },
+    LT: { en: 'Left Thumb', ml: 'ഇടതു കൈ തള്ളവിരൽ', color: '#64748b' },
+    RT: { en: 'Right Thumb', ml: 'വലതു കൈ തള്ളവിരൽ', color: '#64748b' },
+    RI: { en: 'Right Index', ml: 'വലതു കൈ ചൂണ്ടുവിരൽ', color: '#f59e0b' },
+    RM: { en: 'Right Middle', ml: 'വലതു കൈ നടുവിരൽ', color: '#06b6d4' },
+    RR: { en: 'Right Ring', ml: 'വലതു കൈ മോതിരവിരൽ', color: '#a855f7' },
+    RP: { en: 'Right Pinky', ml: 'വലതു കൈ ചെറുവിരൽ', color: '#f43f5e' }
+  };
+
+  const KEY_FINGER_MAP = {
+    Backquote: 'LP', Digit1: 'LP', Digit2: 'LR', Digit3: 'LM', Digit4: 'LI', Digit5: 'LI',
+    Digit6: 'RI', Digit7: 'RI', Digit8: 'RM', Digit9: 'RR', Digit0: 'RP', Minus: 'RP', Equal: 'RP',
+    KeyQ: 'LP', KeyW: 'LR', KeyE: 'LM', KeyR: 'LI', KeyT: 'LI',
+    KeyY: 'RI', KeyU: 'RI', KeyI: 'RM', KeyO: 'RR', KeyP: 'RP', BracketLeft: 'RP', BracketRight: 'RP', Backslash: 'RP',
+    KeyA: 'LP', KeyS: 'LR', KeyD: 'LM', KeyF: 'LI', KeyG: 'LI',
+    KeyH: 'RI', KeyJ: 'RI', KeyK: 'RM', KeyL: 'RR', Semicolon: 'RP', Quote: 'RP',
+    KeyZ: 'LP', KeyX: 'LR', KeyC: 'LM', KeyV: 'LI', KeyB: 'LI',
+    KeyN: 'RI', KeyM: 'RI', Comma: 'RM', Period: 'RR', Slash: 'RP',
+    Space: 'RT'
+  };
+
   /* =========================================================
      2. Sound & Haptics Engine
      ========================================================= */
@@ -765,9 +790,10 @@
       const normal = data.labelNormal || data.normal;
       const shift = data.labelShift || data.shift;
       const keyHint = data.keyName || '';
+      const finger = KEY_FINGER_MAP[code] || '';
 
       return `
-        <button type="button" class="kb-key" data-code="${code}" data-normal="${data.normal}" data-shift="${data.shift}">
+        <button type="button" class="kb-key ${finger ? 'finger-' + finger : ''}" data-code="${code}" data-finger="${finger}" data-normal="${data.normal}" data-shift="${data.shift}">
           <span class="key-hint">${keyHint}</span>
           <span class="key-char primary-char">${normal}</span>
           <span class="key-char shift-char">${shift}</span>
@@ -1403,31 +1429,6 @@
   /* =========================================================
      8. InScript Typing Practice Tutor Curriculum & Engine
      ========================================================= */
-  const FINGER_NAMES = {
-    LP: { en: 'Left Pinky', ml: 'ഇടതു കൈ ചെറുവിരൽ', color: '#ec4899' },
-    LR: { en: 'Left Ring', ml: 'ഇടതു കൈ മോതിരവിരൽ', color: '#8b5cf6' },
-    LM: { en: 'Left Middle', ml: 'ഇടതു കൈ നടുവിരൽ', color: '#3b82f6' },
-    LI: { en: 'Left Index', ml: 'ഇടതു കൈ ചൂണ്ടുവിരൽ', color: '#10b981' },
-    LT: { en: 'Left Thumb', ml: 'ഇടതു കൈ തള്ളവിരൽ', color: '#64748b' },
-    RT: { en: 'Right Thumb', ml: 'വലതു കൈ തള്ളവിരൽ', color: '#64748b' },
-    RI: { en: 'Right Index', ml: 'വലതു കൈ ചൂണ്ടുവിരൽ', color: '#f59e0b' },
-    RM: { en: 'Right Middle', ml: 'വലതു കൈ നടുവിരൽ', color: '#06b6d4' },
-    RR: { en: 'Right Ring', ml: 'വലതു കൈ മോതിരവിരൽ', color: '#a855f7' },
-    RP: { en: 'Right Pinky', ml: 'വലതു കൈ ചെറുവിരൽ', color: '#f43f5e' }
-  };
-
-  const KEY_FINGER_MAP = {
-    Backquote: 'LP', Digit1: 'LP', Digit2: 'LR', Digit3: 'LM', Digit4: 'LI', Digit5: 'LI',
-    Digit6: 'RI', Digit7: 'RI', Digit8: 'RM', Digit9: 'RR', Digit0: 'RP', Minus: 'RP', Equal: 'RP',
-    KeyQ: 'LP', KeyW: 'LR', KeyE: 'LM', KeyR: 'LI', KeyT: 'LI',
-    KeyY: 'RI', KeyU: 'RI', KeyI: 'RM', KeyO: 'RR', KeyP: 'RP', BracketLeft: 'RP', BracketRight: 'RP', Backslash: 'RP',
-    KeyA: 'LP', KeyS: 'LR', KeyD: 'LM', KeyF: 'LI', KeyG: 'LI',
-    KeyH: 'RI', KeyJ: 'RI', KeyK: 'RM', KeyL: 'RR', Semicolon: 'RP', Quote: 'RP',
-    KeyZ: 'LP', KeyX: 'LR', KeyC: 'LM', KeyV: 'LI', KeyB: 'LI',
-    KeyN: 'RI', KeyM: 'RI', Comma: 'RM', Period: 'RR', Slash: 'RP',
-    Space: 'RT'
-  };
-
   const TUTOR_LEVELS = [
     {
       id: 'lvl-1',
@@ -1886,7 +1887,9 @@
       this.tutorFingerGuideCard = document.getElementById('tutorFingerGuideCard');
       this.tutorCompletionCard = document.getElementById('tutorCompletionCard');
       this.tutorEngine = null;
+      this.fingerColorsEnabled = true;
 
+      // Speed Test elements
       this.speedTestModal = document.getElementById('speedTestModal');
       this.speedTestInput = document.getElementById('speedTestInput');
       this.speedWordsContainer = document.getElementById('speedWordsContainer');
@@ -1897,14 +1900,6 @@
       this.speedTestDuration = 1; // 1, 2, 3, 4, 5 mins
       this.speedSession = null;
       this.lastSpeedMetrics = null;
-
-      // Tutor elements
-      this.practiceModal = document.getElementById('practiceModal');
-      this.practiceStageSelect = document.getElementById('practiceStageSelect');
-      this.practiceTargetStream = document.getElementById('practiceTargetStream');
-      this.tutorFingerGuideCard = document.getElementById('tutorFingerGuideCard');
-      this.tutorCompletionCard = document.getElementById('tutorCompletionCard');
-      this.tutorEngine = null;
 
       this.storage = {
         get: (k, def = null) => {
@@ -2164,6 +2159,11 @@
       const startPracticeBtn = document.getElementById('startPracticeBtn');
       if (startPracticeBtn) {
         startPracticeBtn.addEventListener('click', () => this.startTutor());
+      }
+
+      const toggleFingerColorsBtn = document.getElementById('toggleFingerColorsBtn');
+      if (toggleFingerColorsBtn) {
+        toggleFingerColorsBtn.addEventListener('click', () => this.toggleFingerColors());
       }
 
       const resetTutorBtn = document.getElementById('resetTutorBtn');
@@ -2635,6 +2635,38 @@
 
       if (guideDesc && this.tutorEngine && this.tutorEngine.currentStage) {
         guideDesc.textContent = this.tutorEngine.currentStage.instructions || '';
+      }
+
+      // Highlight the active finger on the SVG dual hand diagram
+      const svgFingers = document.querySelectorAll('.hand-finger');
+      svgFingers.forEach((f) => {
+        f.classList.remove('active-finger');
+        f.style.fill = '';
+        f.style.filter = '';
+      });
+
+      if (guide.fingerCode) {
+        const fingerEl = document.getElementById(`finger-${guide.fingerCode}`);
+        if (fingerEl) {
+          fingerEl.classList.add('active-finger');
+          fingerEl.style.fill = guide.fingerColor || '#f59e0b';
+          fingerEl.style.filter = `drop-shadow(0 0 8px ${guide.fingerColor || '#f59e0b'})`;
+        }
+      }
+    }
+
+    toggleFingerColors() {
+      this.fingerColorsEnabled = !this.fingerColorsEnabled;
+      const dock = document.getElementById('tutorKeyboardDock');
+      const btn = document.getElementById('toggleFingerColorsBtn');
+      if (dock) {
+        dock.classList.toggle('finger-colors-enabled', this.fingerColorsEnabled);
+      }
+      if (btn) {
+        btn.classList.toggle('active', this.fingerColorsEnabled);
+        btn.innerHTML = this.fingerColorsEnabled
+          ? '<span>🖐️ വിരൽ നിറങ്ങൾ: ഓൺ</span>'
+          : '<span>🖐️ വിരൽ നിറങ്ങൾ: ഓഫ്</span>';
       }
     }
 

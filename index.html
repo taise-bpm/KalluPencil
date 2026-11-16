@@ -311,6 +311,47 @@
               ക (K) - നടുവിരൽ ഉപയോഗിച്ച് ടൈപ്പ് ചെയ്യുക
             </div>
           </div>
+
+          <!-- Interactive Dual Hand Vector SVG Diagram -->
+          <div class="tutor-hands-box" id="tutorHandsBox" title="കൈവിരലുകളുടെ സ്ഥാനം (Hand & Finger Positions)">
+            <svg class="hands-svg" viewBox="0 0 280 90" xmlns="http://www.w3.org/2000/svg">
+              <!-- LEFT HAND -->
+              <g class="hand-group left-hand" transform="translate(5, 5)">
+                <!-- Palm base -->
+                <path d="M 16,46 C 16,36 30,36 44,36 C 58,36 72,38 80,46 C 90,56 88,74 74,76 C 54,78 28,78 16,70 Z" class="hand-palm" />
+                <!-- Left Pinky (LP) -->
+                <rect id="finger-LP" class="hand-finger" x="12" y="22" width="12" height="30" rx="6" data-finger="LP" />
+                <!-- Left Ring (LR) -->
+                <rect id="finger-LR" class="hand-finger" x="28" y="10" width="12" height="40" rx="6" data-finger="LR" />
+                <!-- Left Middle (LM) -->
+                <rect id="finger-LM" class="hand-finger" x="44" y="4" width="12" height="46" rx="6" data-finger="LM" />
+                <!-- Left Index (LI) -->
+                <rect id="finger-LI" class="hand-finger" x="60" y="12" width="12" height="40" rx="6" data-finger="LI" />
+                <!-- Left Thumb (LT) -->
+                <rect id="finger-LT" class="hand-finger" x="78" y="36" width="12" height="28" rx="6" transform="rotate(35 84 50)" data-finger="LT" />
+                <!-- Label -->
+                <text x="44" y="70" class="hand-label" text-anchor="middle">ഇടതു കൈ</text>
+              </g>
+
+              <!-- RIGHT HAND -->
+              <g class="hand-group right-hand" transform="translate(145, 5)">
+                <!-- Palm base -->
+                <path d="M 38,46 C 46,38 60,36 74,36 C 88,36 102,36 102,46 C 102,70 90,78 70,76 C 56,74 28,56 38,46 Z" class="hand-palm" />
+                <!-- Right Thumb (RT) -->
+                <rect id="finger-RT" class="hand-finger" x="28" y="36" width="12" height="28" rx="6" transform="rotate(-35 34 50)" data-finger="RT" />
+                <!-- Right Index (RI) -->
+                <rect id="finger-RI" class="hand-finger" x="46" y="12" width="12" height="40" rx="6" data-finger="RI" />
+                <!-- Right Middle (RM) -->
+                <rect id="finger-RM" class="hand-finger" x="62" y="4" width="12" height="46" rx="6" data-finger="RM" />
+                <!-- Right Ring (RR) -->
+                <rect id="finger-RR" class="hand-finger" x="78" y="10" width="12" height="40" rx="6" data-finger="RR" />
+                <!-- Right Pinky (RP) -->
+                <rect id="finger-RP" class="hand-finger" x="94" y="22" width="12" height="30" rx="6" data-finger="RP" />
+                <!-- Label -->
+                <text x="74" y="70" class="hand-label" text-anchor="middle">വലതു കൈ</text>
+              </g>
+            </svg>
+          </div>
         </div>
 
         <!-- Target Text Stream with Interactive Highlighting -->
@@ -340,13 +381,34 @@
           </div>
         </div>
 
-        <!-- In-Modal Interactive InScript Keyboard Dock -->
+        <!-- In-Modal Interactive InScript Keyboard Dock with Color-coded Finger Layout -->
         <div class="tutor-keyboard-dock-wrapper" id="tutorKeyboardDockWrapper">
           <div class="tutor-keyboard-dock-header">
-            <span class="dock-title">⌨️ ഇൻസ്ക്രിപ്റ്റ് കീബോർഡ് ലൈവ് ഗൈഡ് (InScript Visual Guide)</span>
-            <span class="dock-hint">തിളങ്ങുന്ന കീ അമർത്തുക (Tap glowing key or press on keyboard)</span>
+            <div class="dock-header-left">
+              <span class="dock-title">⌨️ ഇൻസ്ക്രിപ്റ്റ് കീബോർഡ് വിരൽ ക്രമം (InScript Finger Layout)</span>
+              <span class="dock-hint">ഓരോ വിരലിന്റെയും കീകൾ പ്രത്യേക നിറത്തിൽ നൽകിയിരിക്കുന്നു</span>
+            </div>
+            <div class="dock-header-right">
+              <button type="button" id="toggleFingerColorsBtn" class="btn btn-sm btn-finger-toggle active" title="വിരൽ നിറങ്ങൾ കാണിക്കുക/മറയ്ക്കുക">
+                <span>🖐️ വിരൽ നിറങ്ങൾ: ഓൺ</span>
+              </button>
+            </div>
           </div>
-          <div id="tutorKeyboardDock" class="tutor-keyboard-dock"></div>
+
+          <!-- Color-Coded Finger Legend Strip -->
+          <div class="finger-legend-strip" id="fingerLegendStrip">
+            <span class="legend-chip"><span class="chip-dot" style="background:#ec4899"></span>ഇടതു ചെറുവിരൽ</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#8b5cf6"></span>ഇടതു മോതിരവിരൽ</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#3b82f6"></span>ഇടതു നടുവിരൽ</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#10b981"></span>ഇടതു ചൂണ്ടുവിരൽ</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#64748b"></span>തള്ളവിരൽ (സ്പേസ്)</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#f59e0b"></span>വലതു ചൂണ്ടുവിരൽ</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#06b6d4"></span>വലതു നടുവിരൽ</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#a855f7"></span>വലതു മോതിരവിരൽ</span>
+            <span class="legend-chip"><span class="chip-dot" style="background:#f43f5e"></span>വലതു ചെറുവിരൽ</span>
+          </div>
+
+          <div id="tutorKeyboardDock" class="tutor-keyboard-dock finger-colors-enabled"></div>
         </div>
 
         <!-- Lesson Completion / Celebration Card (Hidden during typing) -->

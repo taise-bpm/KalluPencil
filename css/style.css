@@ -869,6 +869,12 @@ textarea.ml-textarea::placeholder {
     padding: 10px;
   }
 
+  .tutor-hands-box {
+    margin: 8px auto 0;
+    width: 100%;
+    justify-content: center;
+  }
+
   /* Keyboard keys fit perfectly on mobile screens */
   .kb-row {
     gap: 3px;
@@ -1676,6 +1682,130 @@ textarea.ml-textarea::placeholder {
   25% { transform: translateX(-4px); }
   75% { transform: translateX(4px); }
 }
+
+/* =========================================================
+   Interactive Dual Hand Diagram & Finger Legend Styles
+   ========================================================= */
+.tutor-hands-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 6px 12px;
+  margin-left: auto;
+}
+
+.hands-svg {
+  width: 260px;
+  height: 85px;
+}
+
+.hand-palm {
+  fill: var(--bg-secondary);
+  stroke: var(--border-color);
+  stroke-width: 1.5;
+}
+
+.hand-finger {
+  fill: var(--bg-secondary);
+  stroke: var(--border-color);
+  stroke-width: 1.5;
+  transition: all 0.25s ease;
+}
+
+.hand-finger.active-finger {
+  stroke: #ffffff;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.hand-label {
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--text-muted);
+}
+
+/* Finger Legend Bar */
+.finger-legend-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 6px 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2px 8px;
+}
+
+.chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.btn-finger-toggle {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+}
+
+.btn-finger-toggle.active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border-color: #10b981;
+}
+
+/* Color-Coded Keys based on Finger Layout */
+.finger-colors-enabled .kb-key.finger-LP {
+  border-bottom: 3.5px solid #ec4899 !important;
+}
+.finger-colors-enabled .kb-key.finger-LR {
+  border-bottom: 3.5px solid #8b5cf6 !important;
+}
+.finger-colors-enabled .kb-key.finger-LM {
+  border-bottom: 3.5px solid #3b82f6 !important;
+}
+.finger-colors-enabled .kb-key.finger-LI {
+  border-bottom: 3.5px solid #10b981 !important;
+}
+.finger-colors-enabled .kb-key.finger-RI {
+  border-bottom: 3.5px solid #f59e0b !important;
+}
+.finger-colors-enabled .kb-key.finger-RM {
+  border-bottom: 3.5px solid #06b6d4 !important;
+}
+.finger-colors-enabled .kb-key.finger-RR {
+  border-bottom: 3.5px solid #a855f7 !important;
+}
+.finger-colors-enabled .kb-key.finger-RP {
+  border-bottom: 3.5px solid #f43f5e !important;
+}
+.finger-colors-enabled .kb-key.finger-LT,
+.finger-colors-enabled .kb-key.finger-RT,
+.finger-colors-enabled .key-space {
+  border-bottom: 3.5px solid #64748b !important;
+}
+
+/* Active practice key glows vibrant regardless of color */
+.finger-colors-enabled .kb-key.practice-target {
+  background: rgba(245, 158, 11, 0.3) !important;
+  border: 2px solid #f59e0b !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.8), inset 0 0 8px rgba(245, 158, 11, 0.4) !important;
+  transform: translateY(-2px) scale(1.04);
+}
+
 
 
 
