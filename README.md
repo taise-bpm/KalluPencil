@@ -44,20 +44,17 @@ A modern, high-performance Malayalam InScript typing web application designed sp
   - One-click **Copy Result Card** with formatted emoji text to share on WhatsApp, Telegram, or social media!
 * **Works on All Devices:** Compatible with both the On-Screen Touch InScript Keyboard (phones/tablets) and Hardware Keyboards (desktops/laptops).
 
-### 5. 🎯 InScript Master Typing Tutor (ഇന്ററാക്ടീവ് ട്യൂട്ടർ)
-* **7 Progressive Learning Levels (20+ Stages):**
-  - **ലെവൽ 1:** ഹോം റോ (Home Row Fundamentals - ക, ര, പ, ത, ച, ട, ്, ി, ു, േ, ോ)
-  - **ലെവൽ 2:** മുകളിലെ വരി (Top Row QWERTY - ബ, ഹ, ഗ, ദ, ജ, ഡ, ാ, ീ, ൂ, ൈ, ൌ)
-  - **ലെവൽ 3:** താഴത്തെ വരി (Bottom Row ZXCV - െ, ം, മ, ന, വ, ല, സ, യ)
-  - **ലെവൽ 4:** ഷിഫ്റ്റ് കീകൾ (Shift Layer - സ്വതന്ത്ര സ്വരങ്ങൾ & മഹാപ്രാണങ്ങൾ)
-  - **ലെവൽ 5:** ചില്ലക്ഷരങ്ങൾ (Chillus - ൺ, ൻ, ർ, ൽ, ൾ, ൿ)
-  - **ലെവൽ 6:** കൂട്ടക്ഷരങ്ങൾ (Conjuncts - ക്ഷ, ജ്ഞ, ത്ര, ശ്ര, പ്ര, ക്ക, ച്ച, ത്ത...)
-  - **ലെവൽ 7:** വാക്യങ്ങളും വേഗതയും (Sentences & Quotes)
-* **Visual Finger Placement Guidance:** 
-  - Real-time hand and finger indicators (Left/Right Hand, Pinky, Ring, Middle, Index, Thumb) color-coded for each key.
-  - Clear instructions: English key equivalent, finger name in Malayalam & English, and Shift requirement.
-* **Interactive Keyboard Key Glow:** As you learn, the exact key on the visual keyboard pulses and glows with amber light (`practice-target`).
-* **Gamified Star Ratings & Progress:** Earn ⭐ to ⭐⭐⭐ based on accuracy and speed; your stage stars are saved in `localStorage`!
+### 5. 🎯 InScript Master Typing Tutor (Standalone Web App - `tutor.html`)
+* **Dedicated Standalone App (`tutor.html`):** Can be run standalone or directly opened via URL (`tutor.html#stage=5-1`).
+* **Clean, Aligned User Interface:**
+  - **Aligned 3-Column Guidance Arena:** Target character highlight box, step-by-step key & finger instruction badges, and an interactive vector SVG dual-hand diagram.
+  - **Color-Coded Finger Layout Keyboard:** Interactive on-screen InScript keyboard color-coded by finger zones (Pinky, Ring, Middle, Index, Thumb) with a toggle button.
+  - **Live HUD Metrics Bar:** Real-time progress bar, accuracy %, live WPM, and error counter.
+  - **Large Streaming Character Ribbon:** Visual cursor highlight, completed text in green, and shake animation on mistyped keys.
+* **Atomic Chillu Typing Guidance:** Built-in step-by-step decomposed resolution for Indian standard InScript chillus (`ർ`, `ൽ`, `ൾ`, `ൻ`, `ൺ`, `ൿ`) via `[Consonant] + [്] + [ZWJ]`.
+* **Full Local Progress Persistence (`localStorage`):** Remembers all completed lessons, star ratings (up to 60 ⭐ across 20 stages), best WPM, accuracy %, and automatically resumes your last lesson on return.
+* **Curriculum Modal:** Interactive drawer listing all 20 lessons across 7 progressive levels with instant lesson jumping.
+* **Celebration & Scorecard Sharing:** Stage completion celebration modal with 1-click clipboard scorecard copy for sharing.
 
 ### 6. Productive Utilities
 * **One-Tap Clipboard Copy:** With instant toast notification.
@@ -72,7 +69,7 @@ A modern, high-performance Malayalam InScript typing web application designed sp
 ## 🚀 How to Run
 
 ### Option 1: Direct Browser Access (Zero Installation)
-Simply open `index.html` in any modern web browser (Chrome, Safari, Edge, Firefox). Everything runs client-side with zero external build dependencies!
+Simply open `index.html` (Editor & Speed Test) or `tutor.html` (Standalone InScript Typing Tutor) directly in any modern web browser. Everything runs client-side with zero external build dependencies!
 
 ### Option 2: Local Node.js Server
 If you prefer running via a local web server:
@@ -80,9 +77,9 @@ If you prefer running via a local web server:
 npm start
 ```
 Then open:
-```text
-http://localhost:3000
-```
+* Editor & Speed Test: `http://localhost:3000/` or `http://localhost:3000/index.html`
+* Standalone Typing Tutor App: `http://localhost:3000/tutor.html`
+* Deep-linked Lessons: `http://localhost:3000/tutor.html#stage=5-1` (or any stage e.g. `1-1` to `7-2`)
 
 ---
 

@@ -50,10 +50,10 @@
           <span class="icon">⚡</span> <span>സ്പീഡ് ടെസ്റ്റ്</span>
         </button>
 
-        <!-- Typing Practice Tutor Button -->
-        <button type="button" id="practiceBtn" class="btn" title="ടൈപ്പിംഗ് പരിശീലനം (Typing Tutor)">
-          <span class="icon">🎯</span> <span>പരിശീലനം</span>
-        </button>
+        <!-- Typing Practice Tutor Standalone App Link -->
+        <a href="tutor.html" id="practiceBtn" class="btn" style="text-decoration: none;" title="മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ (Standalone Tutor App)">
+          <span class="icon">🎯</span> <span>ട്യൂട്ടർ ആപ്പ്</span>
+        </a>
 
         <!-- Help Guide Button -->
         <button type="button" id="helpBtn" class="btn btn-icon-only" title="കീബോർഡ് സഹായി (InScript Guide)">
@@ -241,6 +241,9 @@
           <h2>🎯 ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ (InScript Master Tutor)</h2>
           <span class="sub-badge">ഇന്ററാക്ടീവ് പാഠങ്ങൾ</span>
         </div>
+        <a href="tutor.html" class="btn btn-secondary" style="text-decoration: none; margin-left: auto; margin-right: 12px; font-size: 0.85rem;" title="പ്രത്യേക പേജിൽ പൂർണ്ണമായി തുറക്കുക">
+          <span>🚀 സ്റ്റാൻഡലോൺ ആപ്പ് (Open App)</span>
+        </a>
         <button type="button" id="closePracticeBtn" class="close-btn">&times;</button>
       </div>
 
@@ -364,20 +367,20 @@
         <!-- Live Metrics Bar -->
         <div class="practice-metrics-row">
           <div class="metric-card">
-            <span class="metric-label">പുരോഗതി (Progress)</span>
-            <span class="metric-value" id="practiceProgress">0%</span>
+            <span class="metric-label">📊 പുരോഗതി</span>
+            <span class="metric-value stat-val-progress" id="practiceProgress">0%</span>
           </div>
           <div class="metric-card">
-            <span class="metric-label">കൃത്യത (Accuracy)</span>
-            <span class="metric-value" id="practiceAccuracy">100%</span>
+            <span class="metric-label">🎯 കൃത്യത</span>
+            <span class="metric-value stat-val-accuracy" id="practiceAccuracy">100%</span>
           </div>
           <div class="metric-card">
-            <span class="metric-label">വേഗത (WPM)</span>
-            <span class="metric-value" id="practiceWpm">0</span>
+            <span class="metric-label">⚡ വേഗത</span>
+            <span class="metric-value stat-val-wpm"><span id="practiceWpm">0</span> <small class="hud-unit">WPM</small></span>
           </div>
           <div class="metric-card">
-            <span class="metric-label">തെറ്റുകൾ (Errors)</span>
-            <span class="metric-value" id="practiceErrors">0</span>
+            <span class="metric-label">❌ തെറ്റുകൾ</span>
+            <span class="metric-value stat-val-errors" id="practiceErrors">0</span>
           </div>
         </div>
 

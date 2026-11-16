@@ -1359,8 +1359,38 @@ textarea.ml-textarea::placeholder {
 
 .practice-metrics-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.stat-val-progress {
+  color: #f59e0b;
+}
+
+.stat-val-accuracy {
+  color: #10b981;
+}
+
+.stat-val-wpm {
+  color: #0ea5e9;
+}
+
+.stat-val-errors {
+  color: #f43f5e;
+}
+
+.hud-unit {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .practice-metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
 }
 
 .metric-card {

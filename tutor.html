@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ml" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ (Malayalam InScript Typing Tutor) - സ്വതന്ത്രമായി വേഗത്തിൽ മലയാളം ടൈപ്പിംഗ് പഠിക്കാനുള്ള മികച്ച ആപ്ലിക്കേഷൻ.">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>മലയാളം ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടർ | InScript Master Tutor</title>
+  
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/tutor.css">
+</head>
+<body class="tutor-app-body">
+  <main class="tutor-standalone-app">
+
+    <!-- Top Application Header -->
+    <header class="tutor-app-header">
+      <div class="tutor-brand-group">
+        <div class="tutor-brand-icon">🎯</div>
+        <div>
+          <h1 class="tutor-brand-title">
+            മലയാളം ഇൻസ്ക്രിപ്റ്റ് ട്യൂട്ടർ
+            <span class="badge">InScript Master</span>
+          </h1>
+          <a href="index.html" class="back-editor-link" title="പ്രധാന മലയാളം എഡിറ്ററിലേക്ക് മടങ്ങുക">
+            <span>← മലയാളം എഡിറ്റർ (Open Editor)</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="tutor-header-controls">
+        <div class="stars-summary-pill" id="totalStarsPill" title="മൊത്തം നേടിയ സ്റ്റാറുകൾ">
+          ⭐ 0 / 60
+        </div>
+        <div class="overall-progress-track" title="മൊത്തം കോഴ്സ് പുരോഗതി">
+          <div class="overall-progress-fill" id="overallProgressBar"></div>
+        </div>
+        <button class="btn btn-secondary" id="openCurriculumBtn" type="button" title="സമ്പൂർണ്ണ പാഠ്യപദ്ധതി കാണുക">
+          <span>📚 എല്ലാ പാഠങ്ങളും</span>
+        </button>
+        <button class="btn btn-secondary" id="soundToggleBtn" type="button" title="ശബ്ദം ഓൺ/ഓഫ്">
+          <span>🔊 ശബ്ദം: ഓഫ്</span>
+        </button>
+        <button class="btn btn-secondary" id="hapticToggleBtn" type="button" title="വൈബ്രേഷൻ ഓൺ/ഓഫ്">
+          <span>📳 വൈബ്രേഷൻ: ഓൺ</span>
+        </button>
+        <button class="btn btn-secondary" id="themeToggleBtn" type="button" title="ലൈറ്റ് / ഡാർക്ക് തീം മാറ്റുക">
+          <span class="icon">☀️</span> <span>ലൈറ്റ്</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Subnav / Stage Navigation Bar -->
+    <nav class="tutor-subnav-strip" aria-label="പാഠങ്ങൾ തിരഞ്ഞെടുക്കുക">
+      <div class="subnav-left">
+        <button class="btn btn-secondary nav-stage-btn" id="prevStageBtn" type="button" title="മുൻപത്തെ പാഠം">
+          <span class="btn-arrow">◀</span>
+          <span class="btn-label-full">മുൻപത്തെ പാഠം</span>
+          <span class="btn-label-short">മുൻപ്</span>
+        </button>
+      </div>
+
+      <div class="subnav-center">
+        <div class="stage-select-wrapper">
+          <span class="stage-select-icon">📚</span>
+          <select class="app-select stage-nav-select" id="tutorStageSelect" aria-label="പാഠം തിരഞ്ഞെടുക്കുക">
+            <!-- Populated dynamically and statically from curriculum -->
+            <optgroup label="ലെവൽ 1: ഹോം റോ (Home Row Fundamentals)">
+              <option value="1-1">1-1: ഹോം റോ അടിസ്ഥാനം (പ ര ക ത / ഹ ഗ ദ ജ)</option>
+              <option value="1-2">1-2: ഹോം റോ വിപുലീകരണം (ി ു ോ േ ്)</option>
+              <option value="1-3">1-3: ഹോം റോ വാക്കുകൾ (Home Row Words)</option>
+            </optgroup>
+            <optgroup label="ലെവൽ 2: ടോപ്പ് റോ (Top Row Keys)">
+              <option value="2-1">2-1: ടോപ്പ് റോ അടിസ്ഥാനം (ബ ഹ ഗ ദ ജ ഡ)</option>
+              <option value="2-2">2-2: സ്വരചിഹ്നങ്ങൾ (ൗ ൈ ാ ീ ൂ)</option>
+              <option value="2-3">2-3: ടോപ്പ് റോ വാക്കുകൾ (Top Row Words)</option>
+            </optgroup>
+            <optgroup label="ലെവൽ 3: ബോട്ടം റോ (Bottom Row Keys)">
+              <option value="3-1">3-1: ബോട്ടം റോ അടിസ്ഥാനം (മ ന വ ല സ യ)</option>
+              <option value="3-2">3-2: ബോട്ടം റോ വാക്കുകൾ (Bottom Row Words)</option>
+            </optgroup>
+            <optgroup label="ലെവൽ 4: ഷിഫ്റ്റ് കീ അക്ഷരങ്ങൾ (Shift Characters)">
+              <option value="4-1">4-1: ഷിഫ്റ്റ് സ്വരാക്ഷരങ്ങൾ (അ ആ ഇ ഈ ഉ ഊ എ ഏ ഐ ഒ ഓ ഔ)</option>
+              <option value="4-2">4-2: ഷിഫ്റ്റ് വ്യഞ്ജനങ്ങൾ (ഫ റ ഖ ഥ ഛ ഠ ഭ ഘ ധ ഝ)</option>
+              <option value="4-3">4-3: അനുസ്വാരവും വിസർഗ്ഗവും (ം ഃ ൃ ഋ)</option>
+            </optgroup>
+            <optgroup label="ലെവൽ 5: ചില്ലക്ഷരങ്ങൾ (Chillu Letters)">
+              <option value="5-1">5-1: അടിസ്ഥാന ചില്ലുകൾ (ർ ൽ ൾ ൻ)</option>
+              <option value="5-2">5-2: ചില്ല് വാക്കുകൾ (Chillu Words)</option>
+              <option value="5-3">5-3: വിപുല ചില്ലുകൾ (ൺ ൿ)</option>
+            </optgroup>
+            <optgroup label="ലെവൽ 6: കൂട്ടക്ഷരങ്ങൾ (Conjuncts & Ligatures)">
+              <option value="6-1">6-1: ഇരട്ടിപ്പ് കൂട്ടക്ഷരങ്ങൾ (ക്ക ത്ത പ്പ ച്ച)</option>
+              <option value="6-2">6-2: സങ്കീർണ്ണ കൂട്ടക്ഷരങ്ങൾ (ങ്ക ഞ്ച ണ്ട ന്ത മ്പ)</option>
+              <option value="6-3">6-3: രേഖ / യ / ര ചിഹ്നങ്ങൾ (ക്യ ക്ര ക്ല പ്ര)</option>
+            </optgroup>
+            <optgroup label="ലെവൽ 7: സമ്പൂർണ്ണ വാക്യങ്ങൾ (Master Sentences)">
+              <option value="7-1">7-1: ലളിത വാക്യങ്ങൾ (Simple Sentences)</option>
+              <option value="7-2">7-2: സമ്പൂർണ്ണ വാക്യ മാസ്റ്ററി (Full Sentence Mastery)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="current-stage-stars-pill" title="ഈ പാഠത്തിലെ മികച്ച റേറ്റിംഗ്">
+          <span class="current-stage-stars" id="currentStageStars">☆☆☆</span>
+        </div>
+      </div>
+
+      <div class="subnav-right">
+        <button class="btn btn-secondary nav-restart-btn" id="restartLessonBtn" type="button" title="പാഠം വീണ്ടും ആരംഭിക്കുക">
+          <span class="btn-icon">🔄</span>
+          <span class="btn-label-full">വീണ്ടും തുടങ്ങുക</span>
+          <span class="btn-label-short">വീണ്ടും</span>
+        </button>
+        <button class="btn btn-primary nav-stage-btn" id="nextStageBtn" type="button" title="അടുത്ത പാഠത്തിലേക്ക് പോവുക">
+          <span class="btn-label-full">അടുത്ത പാഠം</span>
+          <span class="btn-label-short">അടുത്തത്</span>
+          <span class="btn-arrow">▶</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Level Banner Information Strip -->
+    <div class="level-banner-strip">
+      <div class="level-title-group">
+        <h2 id="currentLevelTitle">ലെവൽ 1: ഹോം റോ (Home Row)</h2>
+        <p id="currentLevelSubtitle">ഹോം റോ അടിസ്ഥാനം • പ ര ക ത / ഹ ഗ ദ ജ അക്ഷരങ്ങൾ</p>
+      </div>
+    </div>
+
+    <!-- Guidance Arena: Perfectly Aligned 3-Column Card -->
+    <section class="tutor-guide-arena" aria-label="ടൈപ്പിംഗ് മാർഗ്ഗനിർദ്ദേശം">
+      <!-- Col 1: Big Target Character -->
+      <div class="guide-target-box">
+        <div class="guide-target-char" id="guideTargetChar">ര</div>
+        <div class="guide-target-name" id="guideTargetName">അക്ഷരം: ര</div>
+      </div>
+
+      <!-- Col 2: Finger & Key Instructions -->
+      <div class="guide-details-box">
+        <div class="instruction-row">
+          <span class="instr-label">ഉപയോഗിക്കേണ്ട വിരൽ:</span>
+          <span class="finger-pill" id="guideFingerBadge">
+            <span class="finger-dot" id="guideFingerDot"></span>
+            <span id="guideFingerName">വലതു കൈ ചൂണ്ടുവിരൽ (Right Index)</span>
+          </span>
+        </div>
+        <div class="instruction-row">
+          <span class="instr-label">കീബോർഡ് കീ:</span>
+          <span class="key-pill" id="guideKeyName">Key J</span>
+          <span class="pill-req pill-normal" id="guideShiftReq">നേരിട്ട് അമർത്തുക (Normal)</span>
+        </div>
+        <div class="guide-desc-text" id="guideDescription">
+          ഹോം റോയിലെ അടിസ്ഥാന അക്ഷരങ്ങൾ കൃത്യമായ വിരലുകൾ ഉപയോഗിച്ച് ടൈപ്പ് ചെയ്യുക.
+        </div>
+      </div>
+
+      <!-- Col 3: Visual Dual-Hand Vector SVG Diagram -->
+      <div class="guide-hands-box" id="tutorHandsBox" title="കൈവിരലുകളുടെ സ്ഥാനം (Hand & Finger Positions)">
+        <svg class="hands-svg" viewBox="0 0 260 92" xmlns="http://www.w3.org/2000/svg">
+          <!-- LEFT HAND -->
+          <g id="hand-left">
+            <rect class="hand-palm" x="22" y="42" width="46" height="30" rx="8" />
+            <rect id="finger-LP" class="hand-finger" x="17" y="28" width="9" height="24" rx="4.5" />
+            <rect id="finger-LR" class="hand-finger" x="29" y="16" width="9" height="34" rx="4.5" />
+            <rect id="finger-LM" class="hand-finger" x="41" y="10" width="9" height="40" rx="4.5" />
+            <rect id="finger-LI" class="hand-finger" x="53" y="18" width="9" height="32" rx="4.5" />
+            <rect id="finger-LT" class="hand-finger" x="63" y="34" width="9" height="22" rx="4.5" transform="rotate(28 67 45)" />
+            <text class="hand-label" x="45" y="86" text-anchor="middle">ഇടതു കൈ</text>
+          </g>
+          <!-- RIGHT HAND -->
+          <g id="hand-right">
+            <rect class="hand-palm" x="192" y="42" width="46" height="30" rx="8" />
+            <rect id="finger-RT" class="hand-finger" x="188" y="34" width="9" height="22" rx="4.5" transform="rotate(-28 193 45)" />
+            <rect id="finger-RI" class="hand-finger" x="198" y="18" width="9" height="32" rx="4.5" />
+            <rect id="finger-RM" class="hand-finger" x="210" y="10" width="9" height="40" rx="4.5" />
+            <rect id="finger-RR" class="hand-finger" x="222" y="16" width="9" height="34" rx="4.5" />
+            <rect id="finger-RP" class="hand-finger" x="234" y="28" width="9" height="24" rx="4.5" />
+            <text class="hand-label" x="215" y="86" text-anchor="middle">വലതു കൈ</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Target Text Stream Card (Full Width) -->
+    <section class="tutor-stream-card" aria-label="ടൈപ്പിംഗ് സ്ട്രീം">
+      <div class="stream-label-row">
+        <span>പരിശീലന പാഠം (Target Text):</span>
+        <span>കീബോർഡിൽ ടൈപ്പ് ചെയ്തു തുടങ്ങുക...</span>
+      </div>
+      <div class="tutor-text-stream" id="targetTextStream" tabindex="0" title="ടൈപ്പിംഗ് സ്ട്രീം">
+        <!-- Dynamically rendered character stream with active cursor -->
+      </div>
+    </section>
+
+    <!-- Live Performance HUD Metrics Bar (Full Width, 4 Balanced Columns) -->
+    <section class="tutor-hud-bar" aria-label="തത്സമയ പുരോഗതി വിവരങ്ങൾ">
+      <div class="hud-card">
+        <div class="hud-label"><span>📊</span> പുരോഗതി (Progress)</div>
+        <div class="hud-value stat-val-progress" id="hudProgress">0%</div>
+        <div class="hud-progress-track">
+          <div class="hud-progress-fill" id="hudProgressBarFill"></div>
+        </div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label"><span>🎯</span> കൃത്യത (Accuracy)</div>
+        <div class="hud-value stat-val-accuracy" id="hudAccuracy">100%</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label"><span>⚡</span> വേഗത (Speed)</div>
+        <div class="hud-value-row">
+          <span class="hud-value stat-val-wpm" id="hudWpm">0</span>
+          <span class="hud-unit">WPM</span>
+        </div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label"><span>❌</span> തെറ്റുകൾ (Errors)</div>
+        <div class="hud-value stat-val-errors" id="hudErrors">0</div>
+      </div>
+    </section>
+
+    <!-- InScript Virtual Keyboard Dock with Color-Coded Finger Layout -->
+    <section class="tutor-keyboard-arena" aria-label="ഇൻസ്ക്രിപ്റ്റ് വെർച്വൽ കീബോർഡ്">
+      <div class="tutor-keyboard-arena-header">
+        <div class="title">
+          <span>⌨️ ഇൻസ്ക്രിപ്റ്റ് കീബോർഡ് & വിരൽ ക്രമം</span>
+        </div>
+        <button class="btn btn-secondary btn-finger-toggle active" id="toggleFingerColorsBtn" type="button">
+          <span>🖐️ വിരൽ നിറങ്ങൾ: ഓൺ</span>
+        </button>
+      </div>
+
+      <div class="finger-legend-strip" aria-label="വിരൽ നിറങ്ങളുടെ വിശദീകരണം">
+        <span class="legend-chip"><span class="chip-dot" style="background:#ec4899;"></span> ചെറുവിരൽ (Pinky L)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#8b5cf6;"></span> മോതിരവിരൽ (Ring L)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#3b82f6;"></span> നടുവിരൽ (Mid L)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#10b981;"></span> ചൂണ്ടുവിരൽ (Index L)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#64748b;"></span> തള്ളവിരൽ (Thumb)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#f59e0b;"></span> ചൂണ്ടുവിരൽ (Index R)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#06b6d4;"></span> നടുവിരൽ (Mid R)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#a855f7;"></span> മോതിരവിരൽ (Ring R)</span>
+        <span class="legend-chip"><span class="chip-dot" style="background:#f43f5e;"></span> ചെറുവിരൽ (Pinky R)</span>
+      </div>
+
+      <div class="tutor-keyboard-slot finger-colors-enabled" id="tutorKeyboardContainer">
+        <!-- Rendered dynamically by StandaloneKeyboard -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Full Curriculum Modal -->
+  <div class="modal hidden" id="curriculumModal" role="dialog" aria-modal="true" aria-labelledby="curriculumModalTitle">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content curriculum-modal-content">
+      <div class="modal-header">
+        <h3 id="curriculumModalTitle">📚 സമ്പൂർണ്ണ ഇൻസ്ക്രിപ്റ്റ് പാഠ്യപദ്ധതി (Curriculum)</h3>
+        <button class="btn-icon" id="closeCurriculumBtn" aria-label="ക്ലോസ് ചെയ്യുക" type="button">✕</button>
+      </div>
+      <div class="curriculum-list-container" id="curriculumListContainer">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage Completion Celebration Modal -->
+  <div class="modal hidden" id="completionModal" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content celebration-modal-content">
+      <div class="celebration-icon">🎉</div>
+      <h3 id="celebrationTitle">പാഠം വിജയകരമായി പൂർത്തിയായി!</h3>
+      <div class="celebration-stars" id="celebrationStars">⭐⭐⭐</div>
+      <p id="celebrationSummary">അത്യുജ്ജ്വലം! 3 സ്റ്റാറുകളോടെ നിങ്ങൾ ഈ പാഠത്തിൽ പൂർണ്ണ വൈദഗ്ധ്യം നേടി.</p>
+
+      <div class="celebration-stats-grid">
+        <div class="celebration-stat-item">
+          <span class="label">വേഗത (Speed)</span>
+          <span class="val" id="statFinalWpm">0 WPM</span>
+        </div>
+        <div class="celebration-stat-item">
+          <span class="label">കൃത്യത (Accuracy)</span>
+          <span class="val" id="statFinalAcc">100%</span>
+        </div>
+        <div class="celebration-stat-item">
+          <span class="label">തെറ്റുകൾ (Errors)</span>
+          <span class="val" id="statFinalErrors">0</span>
+        </div>
+      </div>
+
+      <div class="celebration-actions">
+        <button class="btn btn-primary" id="nextLessonCelebrationBtn" type="button">
+          <span>അടുത്ത പാഠം (Next Lesson)</span> ➔
+        </button>
+        <button class="btn btn-secondary" id="restartCelebrationBtn" type="button">
+          <span>🔄 വീണ്ടും ചെയ്യുക</span>
+        </button>
+        <button class="btn btn-secondary" id="copyScorecardBtn" type="button">
+          <span>📋 സ്കോർ കോപ്പി ചെയ്യുക</span>
+        </button>
+        <button class="btn btn-secondary" id="closeCompletionBtn" type="button">
+          <span>അടയ്ക്കുക</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast tutor-toast" id="tutorToast" role="alert" aria-live="polite"></div>
+
+  <!-- Standalone Tutor Application Script -->
+  <script src="src/tutor-app.js"></script>
+</body>
+</html>
