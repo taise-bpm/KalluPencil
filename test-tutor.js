@@ -74,6 +74,39 @@ assert.strictEqual(mockStorage.getItem('ml_tutor_last_stage'), '5-1', 'Last stag
 
 console.log('✓ LocalStorage persistence verified.');
 
+// 6. Test Stage 2.1 KeyQ & Left Pinky Finger Resolution
+console.log('Test 6: Testing Stage 2.1 Au matra (KeyQ, Left Pinky, U+0D57 & U+0D4C)...');
+global.document = { readyState: 'complete', documentElement: { setAttribute: () => {} }, getElementById: () => null, querySelectorAll: () => [] };
+global.window = { addEventListener: () => {} };
+global.localStorage = new MockLocalStorage();
+
+let code = tutorAppJs.replace(/window\.tutorApp\s*=\s*new StandaloneTutorApp\(\);/g, '// noop');
+code = code.replace('(function () {', 'function runTutorTest() {').replace('})();', 'return { TutorEngine }; }');
+const { TutorEngine } = eval(code + '; runTutorTest()');
+
+const testEngine = new TutorEngine();
+testEngine.loadStage('2-1');
+testEngine.start();
+
+// Advance to index 8 ('ൗ')
+testEngine.currentIndex = 8;
+const guideQ = testEngine.getCurrentKeyGuide();
+assert.ok(guideQ, 'Guide must exist for index 8');
+assert.strictEqual(guideQ.code, 'KeyQ', 'Stage 2.1 Au mark must map to KeyQ');
+assert.strictEqual(guideQ.fingerCode, 'LP', 'Stage 2.1 Au mark must map to Left Pinky (LP)');
+assert.strictEqual(guideQ.fingerMl, 'ഇടതു കൈ ചെറുവിരൽ', 'Finger in Malayalam must be Left Pinky');
+assert.strictEqual(guideQ.keyName, 'Q', 'Key label should be Q');
+
+// Test input with modern U+0D57
+const resU0D57 = testEngine.processKeyInput('\u0D57');
+assert.strictEqual(resU0D57.correct, true, 'Typing \\u0D57 must be accepted as correct');
+
+// Reset to index 8 and test input with legacy U+0D4C
+testEngine.currentIndex = 8;
+const resU0D4C = testEngine.processKeyInput('\u0D4C');
+assert.strictEqual(resU0D4C.correct, true, 'Typing legacy \\u0D4C must also be accepted as correct');
+console.log('✓ Stage 2.1 KeyQ (Left Pinky / ചെറുവിരൽ) and dual AU input verified successfully.');
+
 console.log('\n=======================================');
 console.log('ALL STANDALONE TUTOR APP TESTS PASSED!');
 console.log('=======================================');

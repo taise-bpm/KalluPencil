@@ -26,7 +26,7 @@
     Equal: { normal: '\u0D43', shift: '\u0D0B', labelNormal: 'ൃ', labelShift: 'ഋ', keyName: '=' },
 
     // Top row (QWERTY)
-    KeyQ: { normal: '\u0D4C', shift: '\u0D14', labelNormal: 'ൗ', labelShift: 'ഔ', keyName: 'Q' },
+    KeyQ: { normal: '\u0D57', altNormal: '\u0D4C', shift: '\u0D14', labelNormal: 'ൗ', labelShift: 'ഔ', keyName: 'Q' },
     KeyW: { normal: '\u0D48', shift: '\u0D10', labelNormal: 'ൈ', labelShift: 'ഐ', keyName: 'W' },
     KeyE: { normal: '\u0D3E', shift: '\u0D06', labelNormal: 'ാ', labelShift: 'ആ', keyName: 'E' },
     KeyR: { normal: '\u0D40', shift: '\u0D08', labelNormal: 'ീ', labelShift: 'ഈ', keyName: 'R' },
@@ -1191,6 +1191,55 @@
     }
   ];
 
+  const SPEED_CHILLU_MAP = {
+    '\u0D23\u0D4D\u200D': '\u0D7A',
+    '\u0D28\u0D4D\u200D': '\u0D7B',
+    '\u0D30\u0D4D\u200D': '\u0D7C',
+    '\u0D32\u0D4D\u200D': '\u0D7D',
+    '\u0D33\u0D4D\u200D': '\u0D7E',
+    '\u0D15\u0D4D\u200D': '\u0D7F'
+  };
+
+  const SPEED_ATOMIC_TO_DECOMPOSED = {
+    '\u0D7A': '\u0D23\u0D4D\u200D',
+    '\u0D7B': '\u0D28\u0D4D\u200D',
+    '\u0D7C': '\u0D30\u0D4D\u200D',
+    '\u0D7D': '\u0D32\u0D4D\u200D',
+    '\u0D7E': '\u0D33\u0D4D\u200D',
+    '\u0D7F': '\u0D15\u0D4D\u200D'
+  };
+
+  function normalizeMalayalamForSpeedTest(str) {
+    if (!str) return '';
+    let s = str.normalize('NFC');
+    for (const [k, v] of Object.entries(SPEED_CHILLU_MAP)) {
+      s = s.split(k).join(v);
+    }
+    return s;
+  }
+
+  function toDecomposedForSpeedTest(str) {
+    if (!str) return '';
+    let s = str.normalize('NFC');
+    for (const [k, v] of Object.entries(SPEED_ATOMIC_TO_DECOMPOSED)) {
+      s = s.split(k).join(v);
+    }
+    return s;
+  }
+
+  function isMalayalamWordMatch(a, b) {
+    if (!a || !b) return false;
+    const aTrim = a.trim();
+    const bTrim = b.trim();
+    if (aTrim === bTrim) return true;
+    const aNorm = aTrim.normalize('NFC');
+    const bNorm = bTrim.normalize('NFC');
+    if (aNorm === bNorm) return true;
+    if (normalizeMalayalamForSpeedTest(aNorm) === normalizeMalayalamForSpeedTest(bNorm)) return true;
+    if (toDecomposedForSpeedTest(aNorm) === toDecomposedForSpeedTest(bNorm)) return true;
+    return false;
+  }
+
   class SpeedTestSession {
     constructor(durationMinutes = 1) {
       this.durationSeconds = durationMinutes * 60;
@@ -1279,7 +1328,7 @@
       if (this.currentWordIndex >= this.words.length) return;
 
       const targetWord = this.words[this.currentWordIndex];
-      const isCorrect = typedWord === targetWord;
+      const isCorrect = isMalayalamWordMatch(typedWord, targetWord);
 
       this.wordResults.push({
         target: targetWord,
@@ -1474,10 +1523,10 @@
       stages: [
         {
           id: '2-1',
-          title: 'പാഠം 2.1: മുകളിലെ സ്വരചിഹ്നങ്ങൾ (ാ, ീ, ൂ, ൈ, ൌ)',
+          title: 'പാഠം 2.1: മുകളിലെ സ്വരചിഹ്നങ്ങൾ (ാ, ീ, ൂ, ൈ, ൗ)',
           description: 'E, R, T, W, Q എന്നീ കീകൾ പഠിക്കുക',
-          targetText: 'ാ ീ ൂ ൈ ൌ കാ കീ കൂ കൈ കൗ പാ പീ പൂ പൈ പൗ',
-          instructions: 'ാ (E) - നടുവിരൽ | ീ (R) - ചൂണ്ടുവിരൽ | ൂ (T) - ചൂണ്ടുവിരൽ | ൈ (W) - മോതിരവിരൽ | ൌ (Q) - ചെറുവിരൽ'
+          targetText: 'ാ ീ ൂ ൈ ൗ കാ കീ കൂ കൈ കൗ പാ പീ പൂ പൈ പൗ',
+          instructions: 'ാ (E) - നടുവിരൽ | ീ (R) - ചൂണ്ടുവിരൽ | ൂ (T) - ചൂണ്ടുവിരൽ | ൈ (W) - മോതിരവിരൽ | ൗ (Q) - ചെറുവിരൽ'
         },
         {
           id: '2-2',
@@ -1728,6 +1777,18 @@
         char: ' '
       });
 
+      // Aliases: Support both modern AU length mark (U+0D57) and legacy vowel sign AU (U+0D4C)
+      const qFinger = KEY_FINGER_MAP.KeyQ || 'LP';
+      const qEntry = {
+        code: 'KeyQ',
+        keyName: 'Q',
+        shift: false,
+        finger: qFinger,
+        char: 'ൗ'
+      };
+      map.set('\u0D57', qEntry);
+      map.set('\u0D4C', qEntry);
+
       return map;
     }
 
@@ -1820,6 +1881,7 @@
       }
 
       const fingerObj = FINGER_NAMES[info.finger] || FINGER_NAMES.RI;
+      const displayChar = char === '\u0D4C' ? '\u0D57' : char;
 
       return {
         char,
@@ -1830,7 +1892,7 @@
         fingerMl: fingerObj.ml,
         fingerEn: fingerObj.en,
         fingerColor: fingerObj.color,
-        stepTitle: `അക്ഷരം: ${char}`
+        stepTitle: `അക്ഷരം: ${displayChar}`
       };
     }
 
@@ -1904,8 +1966,9 @@
         }
       }
 
-      // Normal single-keystroke characters
-      if (typedChar === expected) {
+      // Normal single-keystroke characters with Unicode normalization/aliasing for AU vowel sign
+      const isAuMatch = (typedChar === '\u0D57' || typedChar === '\u0D4C') && (expected === '\u0D57' || expected === '\u0D4C');
+      if (typedChar === expected || isAuMatch) {
         this.correctCount++;
         this.currentIndex++;
         this.chilluSubStep = 0;
@@ -2753,8 +2816,9 @@
       const shiftReq = document.getElementById('guideShiftReq');
       const guideDesc = document.getElementById('guideDescription');
 
-      if (targetCharEl) targetCharEl.textContent = guide.char === ' ' ? '␣ (Space)' : guide.char;
-      if (targetNameEl) targetNameEl.textContent = guide.stepTitle || `അക്ഷരം: ${guide.char === ' ' ? 'സ്പേസ്' : guide.char}`;
+      const displayChar = guide.char === ' ' ? '␣ (Space)' : (guide.char === '\u0D4C' ? '\u0D57' : guide.char);
+      if (targetCharEl) targetCharEl.textContent = displayChar;
+      if (targetNameEl) targetNameEl.textContent = guide.stepTitle || `അക്ഷരം: ${displayChar}`;
 
       if (fingerDot && guide.fingerColor) fingerDot.style.background = guide.fingerColor;
       if (fingerName) fingerName.textContent = `${guide.fingerMl} (${guide.fingerEn})`;

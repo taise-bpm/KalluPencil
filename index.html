@@ -48,9 +48,12 @@
           <span class="icon">🎙️</span> <span>വോയ്‌സ്</span>
         </button>
 
-        <!-- Speed Test Button -->
-        <button type="button" id="speedTestBtn" class="btn btn-speed" title="മലയാളം ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് (1-5 മിനിറ്റ്)">
-          <span class="icon">⚡</span> <span>സ്പീഡ് ടെസ്റ്റ്</span>
+        <!-- Speed Test Standalone App & Modal Trigger -->
+        <a href="speedtest.html" id="speedTestAppBtn" class="btn btn-speed" style="text-decoration: none;" title="മലയാളം ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് ആപ്പ് (Standalone Speed Test App)">
+          <span class="icon">⚡</span> <span>സ്പീഡ് ടെസ്റ്റ് ആപ്പ്</span>
+        </a>
+        <button type="button" id="speedTestBtn" class="btn" title="മലയാളം ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ് (1-5 മിനിറ്റ്)">
+          <span class="icon">⏱️</span> <span>ക്വിക്ക് ടെസ്റ്റ്</span>
         </button>
 
         <!-- Typing Practice Tutor Standalone App Link -->
@@ -466,9 +469,14 @@
               <button type="button" class="btn duration-btn" data-minutes="5">5 മിനിറ്റ്</button>
             </div>
           </div>
-          <button type="button" id="startSpeedTestBtn" class="btn btn-primary btn-start-test">
-            <span>🚀 ടെസ്റ്റ് ആരംഭിക്കുക</span>
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" id="startSpeedTestBtn" class="btn btn-primary btn-start-test">
+              <span>🚀 ടെസ്റ്റ് ആരംഭിക്കുക</span>
+            </button>
+            <a href="speedtest.html" class="btn btn-secondary" style="text-decoration: none;" title="ഫുൾ സ്ക്രീൻ സ്പീഡ് ടെസ്റ്റ് ആപ്പിൽ തുറക്കുക">
+              <span>🌐 ഫുൾ സ്ക്രീൻ ആപ്പ്</span>
+            </a>
+          </div>
         </div>
 
         <!-- Live Speed Test Active Area -->

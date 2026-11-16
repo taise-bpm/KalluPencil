@@ -256,10 +256,10 @@
       stages: [
         {
           id: '2-1',
-          title: 'പാഠം 2.1: മുകളിലെ സ്വരചിഹ്നങ്ങൾ (ാ, ീ, ൂ, ൈ, ൌ)',
+          title: 'പാഠം 2.1: മുകളിലെ സ്വരചിഹ്നങ്ങൾ (ാ, ീ, ൂ, ൈ, ൗ)',
           description: 'E, R, T, W, Q എന്നീ കീകൾ പഠിക്കുക',
-          targetText: 'ാ ീ ൂ ൈ ൌ കാ കീ കൂ കൈ കൗ പാ പീ പൂ പൈ പൗ',
-          instructions: 'ാ (E) - നടുവിരൽ | ീ (R) - ചൂണ്ടുവിരൽ | ൂ (T) - ചൂണ്ടുവിരൽ | ൈ (W) - മോതിരവിരൽ | ൌ (Q) - ചെറുവിരൽ'
+          targetText: 'ാ ീ ൂ ൈ ൗ കാ കീ കൂ കൈ കൗ പാ പീ പൂ പൈ പൗ',
+          instructions: 'ാ (E) - നടുവിരൽ | ീ (R) - ചൂണ്ടുവിരൽ | ൂ (T) - ചൂണ്ടുവിരൽ | ൈ (W) - മോതിരവിരൽ | ൗ (Q) - ചെറുവിരൽ'
         },
         {
           id: '2-2',
@@ -470,6 +470,18 @@
         char: ' '
       });
 
+      // Aliases: Support both modern AU length mark (U+0D57) and legacy vowel sign AU (U+0D4C)
+      const qFinger = KEY_FINGER_MAP.KeyQ || 'LP';
+      const qEntry = {
+        code: 'KeyQ',
+        keyName: 'Q',
+        shift: false,
+        finger: qFinger,
+        char: 'ൗ'
+      };
+      map.set('\u0D57', qEntry);
+      map.set('\u0D4C', qEntry);
+
       return map;
     }
 
@@ -562,6 +574,7 @@
       }
 
       const fingerObj = FINGER_NAMES[info.finger] || FINGER_NAMES.RI;
+      const displayChar = char === '\u0D4C' ? '\u0D57' : char;
 
       return {
         char,
@@ -572,7 +585,7 @@
         fingerMl: fingerObj.ml,
         fingerEn: fingerObj.en,
         fingerColor: fingerObj.color,
-        stepTitle: `അക്ഷരം: ${char}`
+        stepTitle: `അക്ഷരം: ${displayChar}`
       };
     }
 
@@ -646,8 +659,9 @@
         }
       }
 
-      // Normal single-keystroke characters
-      if (typedChar === expected) {
+      // Normal single-keystroke characters with Unicode normalization/aliasing for AU vowel sign
+      const isAuMatch = (typedChar === '\u0D57' || typedChar === '\u0D4C') && (expected === '\u0D57' || expected === '\u0D4C');
+      if (typedChar === expected || isAuMatch) {
         this.correctCount++;
         this.currentIndex++;
         this.chilluSubStep = 0;
@@ -1396,8 +1410,9 @@
       const shiftReq = document.getElementById('guideShiftReq');
       const guideDesc = document.getElementById('guideDescription');
 
-      if (targetCharEl) targetCharEl.textContent = guide.char === ' ' ? '␣' : guide.char;
-      if (targetNameEl) targetNameEl.textContent = guide.stepTitle || `അക്ഷരം: ${guide.char === ' ' ? 'സ്പേസ്' : guide.char}`;
+      const displayChar = guide.char === ' ' ? '␣' : (guide.char === '\u0D4C' ? '\u0D57' : guide.char);
+      if (targetCharEl) targetCharEl.textContent = displayChar;
+      if (targetNameEl) targetNameEl.textContent = guide.stepTitle || `അക്ഷരം: ${displayChar}`;
 
       if (fingerDot && guide.fingerColor) fingerDot.style.background = guide.fingerColor;
       if (fingerName) fingerName.textContent = `${guide.fingerMl} (${guide.fingerEn})`;
@@ -1584,21 +1599,24 @@
         const stagesHtml = lvl.stages.map((stg) => {
           const saved = allProgress[stg.id];
           const isCurrent = stg.id === currentId;
-          const stars = saved && saved.stars > 0 ? '⭐'.repeat(saved.stars) : '☆☆☆';
-          const scoreInfo = saved ? `${saved.wpm} WPM • ${saved.accuracy}%` : 'പൂർത്തിയാക്കിയിട്ടില്ല';
+          const isDone = saved && saved.stars > 0;
+          const stars = isDone ? '⭐'.repeat(saved.stars) : '☆☆☆';
+          const scorePill = isDone
+            ? `<span class="stage-perf-badge perf-done">⚡ ${saved.wpm} WPM • 🎯 ${saved.accuracy}%</span>`
+            : `<span class="stage-perf-badge perf-pending">🌱 ആരംഭിച്ചിട്ടില്ല</span>`;
 
           return `
             <div class="curriculum-stage-item ${isCurrent ? 'current-active' : ''}" data-stage-id="${stg.id}">
-              <div class="stage-info">
+              <div class="curriculum-item-top">
                 <span class="stage-code">${stg.id}</span>
-                <div class="stage-text">
-                  <strong>${stg.title}</strong>
-                  <small>${stg.description}</small>
-                </div>
+                <span class="stage-stars ${isDone ? 'stars-earned' : 'stars-none'}">${stars}</span>
               </div>
-              <div class="stage-stats-badge">
-                <span class="stars-icon">${stars}</span>
-                <span class="score-desc">${scoreInfo}</span>
+              <div class="curriculum-item-content">
+                <strong class="stage-title">${stg.title}</strong>
+                <p class="stage-desc">${stg.description}</p>
+              </div>
+              <div class="curriculum-item-bottom">
+                ${scorePill}
               </div>
             </div>
           `;

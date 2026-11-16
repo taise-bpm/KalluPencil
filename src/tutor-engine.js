@@ -121,6 +121,18 @@ export class TutorEngine {
       char: ' '
     });
 
+    // Aliases: Support both modern AU length mark (U+0D57) and legacy vowel sign AU (U+0D4C)
+    const qFinger = KEY_FINGER_MAP.KeyQ || 'LP';
+    const qEntry = {
+      code: 'KeyQ',
+      keyName: 'Q',
+      shift: false,
+      finger: qFinger,
+      char: 'ൗ'
+    };
+    map.set('\u0D57', qEntry);
+    map.set('\u0D4C', qEntry);
+
     return map;
   }
 
@@ -213,6 +225,7 @@ export class TutorEngine {
     }
 
     const fingerObj = FINGER_NAMES[info.finger] || FINGER_NAMES.RI;
+    const displayChar = char === '\u0D4C' ? '\u0D57' : char;
 
     return {
       char,
@@ -223,7 +236,7 @@ export class TutorEngine {
       fingerMl: fingerObj.ml,
       fingerEn: fingerObj.en,
       fingerColor: fingerObj.color,
-      stepTitle: `അക്ഷരം: ${char}`
+      stepTitle: `അക്ഷരം: ${displayChar}`
     };
   }
 
@@ -297,8 +310,9 @@ export class TutorEngine {
       }
     }
 
-    // Normal single-keystroke characters
-    if (typedChar === expected) {
+    // Normal single-keystroke characters with Unicode normalization/aliasing for AU vowel sign
+    const isAuMatch = (typedChar === '\u0D57' || typedChar === '\u0D4C') && (expected === '\u0D57' || expected === '\u0D4C');
+    if (typedChar === expected || isAuMatch) {
       this.correctCount++;
       this.currentIndex++;
       this.chilluSubStep = 0;

@@ -37,6 +37,55 @@ export const MALAYALAM_SPEED_PASSAGES = [
   }
 ];
 
+const SPEED_CHILLU_MAP = {
+  '\u0D23\u0D4D\u200D': '\u0D7A',
+  '\u0D28\u0D4D\u200D': '\u0D7B',
+  '\u0D30\u0D4D\u200D': '\u0D7C',
+  '\u0D32\u0D4D\u200D': '\u0D7D',
+  '\u0D33\u0D4D\u200D': '\u0D7E',
+  '\u0D15\u0D4D\u200D': '\u0D7F'
+};
+
+const SPEED_ATOMIC_TO_DECOMPOSED = {
+  '\u0D7A': '\u0D23\u0D4D\u200D',
+  '\u0D7B': '\u0D28\u0D4D\u200D',
+  '\u0D7C': '\u0D30\u0D4D\u200D',
+  '\u0D7D': '\u0D32\u0D4D\u200D',
+  '\u0D7E': '\u0D33\u0D4D\u200D',
+  '\u0D7F': '\u0D15\u0D4D\u200D'
+};
+
+function normalizeMalayalamForSpeedTest(str) {
+  if (!str) return '';
+  let s = str.normalize('NFC');
+  for (const [k, v] of Object.entries(SPEED_CHILLU_MAP)) {
+    s = s.split(k).join(v);
+  }
+  return s;
+}
+
+function toDecomposedForSpeedTest(str) {
+  if (!str) return '';
+  let s = str.normalize('NFC');
+  for (const [k, v] of Object.entries(SPEED_ATOMIC_TO_DECOMPOSED)) {
+    s = s.split(k).join(v);
+  }
+  return s;
+}
+
+function isMalayalamWordMatch(a, b) {
+  if (!a || !b) return false;
+  const aTrim = a.trim();
+  const bTrim = b.trim();
+  if (aTrim === bTrim) return true;
+  const aNorm = aTrim.normalize('NFC');
+  const bNorm = bTrim.normalize('NFC');
+  if (aNorm === bNorm) return true;
+  if (normalizeMalayalamForSpeedTest(aNorm) === normalizeMalayalamForSpeedTest(bNorm)) return true;
+  if (toDecomposedForSpeedTest(aNorm) === toDecomposedForSpeedTest(bNorm)) return true;
+  return false;
+}
+
 export class SpeedTestSession {
   constructor(durationMinutes = 1, customText = '') {
     this.durationSeconds = durationMinutes * 60;
@@ -135,7 +184,7 @@ export class SpeedTestSession {
     if (this.currentWordIndex >= this.words.length) return;
 
     const targetWord = this.words[this.currentWordIndex];
-    const isCorrect = typedWord === targetWord;
+    const isCorrect = isMalayalamWordMatch(typedWord, targetWord);
 
     this.wordResults.push({
       target: targetWord,

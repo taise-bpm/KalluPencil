@@ -20,7 +20,7 @@ export const INSCRIPT_MAP = {
   Equal: { normal: '\u0D43', shift: '\u0D0B', labelNormal: 'ൃ', labelShift: 'ഋ', keyName: '=' }, // Vocalic R sign / Letter
 
   // Top row (QWERTY)
-  KeyQ: { normal: '\u0D4C', shift: '\u0D14', labelNormal: 'ൗ', labelShift: 'ഔ', keyName: 'Q' }, // Au sign / Au letter
+  KeyQ: { normal: '\u0D57', altNormal: '\u0D4C', shift: '\u0D14', labelNormal: 'ൗ', labelShift: 'ഔ', keyName: 'Q' }, // Au length mark / Au letter
   KeyW: { normal: '\u0D48', shift: '\u0D10', labelNormal: 'ൈ', labelShift: 'ഐ', keyName: 'W' }, // Ai sign / Ai letter
   KeyE: { normal: '\u0D3E', shift: '\u0D06', labelNormal: 'ാ', labelShift: 'ആ', keyName: 'E' }, // Aa sign / Aa letter
   KeyR: { normal: '\u0D40', shift: '\u0D08', labelNormal: 'ീ', labelShift: 'ഈ', keyName: 'R' }, // Ii sign / Ii letter

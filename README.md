@@ -69,7 +69,11 @@ A modern, high-performance Malayalam InScript typing web application designed sp
 ## 🚀 How to Run
 
 ### Option 1: Direct Browser Access (Zero Installation)
-Simply open `index.html` (Editor & Speed Test) or `tutor.html` (Standalone InScript Typing Tutor) directly in any modern web browser. Everything runs client-side with zero external build dependencies!
+Simply open any of the three standalone apps directly in any modern web browser:
+* **കല്ലുപെൻസിൽ എഡിറ്റർ (Malayalam Editor):** `index.html`
+* **കല്ലുപെൻസിൽ സ്പീഡ് ടെസ്റ്റ് (Standalone Speed Test App):** `speedtest.html`
+* **കല്ലുപെൻസിൽ ട്യൂട്ടർ (InScript Master Tutor App):** `tutor.html`
+Everything runs client-side with zero external build dependencies!
 
 ### Option 2: Local Node.js Server
 If you prefer running via a local web server:
@@ -77,7 +81,9 @@ If you prefer running via a local web server:
 npm start
 ```
 Then open:
-* Editor & Speed Test: `http://localhost:3000/` or `http://localhost:3000/index.html`
+* Editor: `http://localhost:3000/` or `http://localhost:3000/index.html`
+* Speed Test App: `http://localhost:3000/speedtest.html` (supports `#duration=2`, `#duration=3`, `#duration=5`)
+* InScript Tutor App: `http://localhost:3000/tutor.html` (supports `#stage=1-1` through `#stage=7-2`)
 * Standalone Typing Tutor App: `http://localhost:3000/tutor.html`
 * Deep-linked Lessons: `http://localhost:3000/tutor.html#stage=5-1` (or any stage e.g. `1-1` to `7-2`)
 

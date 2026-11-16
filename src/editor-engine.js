@@ -185,7 +185,8 @@ export class MalayalamEditorEngine {
       case '\u0D48': return '\u0D10'; // ൈ -> ഐ
       case '\u0D4A': return '\u0D12'; // ൊ -> ഒ
       case '\u0D4B': return '\u0D13'; // ോ -> ഓ
-      case '\u0D4C': return '\u0D14'; // ൗ -> ഔ
+      case '\u0D4C':
+      case '\u0D57': return '\u0D14'; // ൗ -> ഔ
       default: return char;
     }
   }

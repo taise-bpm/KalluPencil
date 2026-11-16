@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ml" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description"
+    content="കല്ലുപെൻസിൽ സ്പീഡ് ടെസ്റ്റ് (Kallu Pencil Malayalam Typing Speed Test) - മലയാളം ടൈപ്പിംഗ് വേഗതയും കൃത്യതയും അളക്കാനുള്ള സ്വതന്ത്ര ആപ്ലിക്കേഷൻ.">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>കല്ലുപെൻസിൽ സ്പീഡ് ടെസ്റ്റ് | Kallu Pencil - മലയാളം ടൈപ്പിംഗ് സ്പീഡ് ടെസ്റ്റ്</title>
+
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/speedtest.css">
+</head>
+
+<body class="speedtest-app-body">
+  <main class="speedtest-standalone-app">
+
+    <!-- Top Application Header -->
+    <header class="speedtest-app-header">
+      <div class="speedtest-brand-group">
+        <div class="speedtest-brand-icon" title="കല്ലുപെൻസിൽ (Kallu Pencil)">
+          <img src="icon.svg" alt="കല്ലുപെൻസിൽ Logo" width="42" height="42" />
+        </div>
+        <div>
+          <h1 class="speedtest-brand-title">
+            കല്ലുപെൻസിൽ സ്പീഡ് ടെസ്റ്റ്
+            <span class="speedtest-sub-badge">Kallu Pencil</span>
+            <span class="badge-speed">Speed Test Master</span>
+          </h1>
+        </div>
+      </div>
+
+      <nav class="speedtest-header-nav" aria-label="പ്രധാന മെനു">
+        <a href="index.html" class="header-link-btn" title="പ്രധാന എഡിറ്ററിലേക്ക് മടങ്ങുക">
+          <span>📝 എഡിറ്റർ</span>
+        </a>
+        <a href="tutor.html" class="header-link-btn" title="ഇൻസ്ക്രിപ്റ്റ് ടൈപ്പിംഗ് ട്യൂട്ടറിലേക്ക് പോകുക">
+          <span>🎓 ട്യൂട്ടർ ആപ്പ്</span>
+        </a>
+        <button class="header-link-btn" id="soundToggleBtn" type="button" title="ശബ്ദം ഓൺ/ഓഫ് ചെയ്യുക">
+          <span class="icon">🔊</span> <span>ശബ്ദം: ഓൺ</span>
+        </button>
+        <button class="header-link-btn" id="themeToggleBtn" type="button" title="ലൈറ്റ് / ഡാർക്ക് തീം മാറ്റുക">
+          <span class="icon">☀️</span> <span>ലൈറ്റ് മോഡ്</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Test Configuration Ribbon (Compact Dropdown Bar) -->
+    <section class="speedtest-config-ribbon" aria-label="ടെസ്റ്റ് ക്രമീകരണങ്ങൾ">
+      <!-- Duration Dropdown -->
+      <div class="config-field">
+        <label for="durationSelect" class="config-label">⏱️ സമയം:</label>
+        <select id="durationSelect" class="config-select" aria-label="ടെസ്റ്റ് ദൈർഘ്യം">
+          <option value="1">1 മിനിറ്റ് (1 Minute)</option>
+          <option value="2">2 മിനിറ്റ് (2 Minutes)</option>
+          <option value="3">3 മിനിറ്റ് (3 Minutes)</option>
+          <option value="5">5 മിനിറ്റ് (5 Minutes)</option>
+        </select>
+      </div>
+
+      <!-- Mode Dropdown -->
+      <div class="config-field">
+        <label for="modeSelect" class="config-label">📖 പാഠം:</label>
+        <select id="modeSelect" class="config-select" aria-label="പാഠത്തിന്റെ രീതി">
+          <option value="standard">📚 സാധാരണ പാഠം (Standard)</option>
+          <option value="jumble">🔀 പദാവലി മിശ്രണം (Jumble Words)</option>
+          <option value="custom">✍️ സ്വന്തം പാഠം (Custom Text)</option>
+        </select>
+      </div>
+
+      <!-- Input Method Dropdown -->
+      <div class="config-field">
+        <label for="methodSelect" class="config-label">⌨️ ഇൻപുട്ട്:</label>
+        <select id="methodSelect" class="config-select" aria-label="ഇൻപുട്ട് രീതി">
+          <option value="inscript">ഫിസിക്കൽ ഇൻസ്ക്രിപ്റ്റ് (InScript)</option>
+          <option value="native">സിസ്റ്റം കീബോർഡ് (System Keyboard)</option>
+        </select>
+      </div>
+
+      <!-- Virtual Keyboard Guide Button -->
+      <div class="config-field config-field-btn">
+        <button type="button" class="config-kb-btn" id="toggleKeyboardBtn" title="കീബോർഡ് ലേഔട്ട് സഹായം കാണിക്കുക">
+          ⌨️ കീബോർഡ് ഗൈഡ്
+        </button>
+      </div>
+    </section>
+
+    <!-- Custom Text Drawer (Collapsible) -->
+    <section class="custom-text-drawer hidden" id="customTextDrawer" aria-label="കസ്റ്റം പാഠം നൽകാനുള്ള ഇടം">
+      <label for="customPassageInput" style="font-weight: 700; font-size: 0.9rem;">
+        ✍️ നിങ്ങൾക്കിഷ്ടമുള്ള മലയാളം പാഠം ഇവിടെ പേസ്റ്റ് ചെയ്യുക:
+      </label>
+      <textarea id="customPassageInput" class="custom-text-textarea" placeholder="മലയാളം വാർത്തകൾ, ലേഖനങ്ങൾ അല്ലെങ്കിൽ പാരഗ്രാഫ് ഇവിടെ ടൈപ്പ് ചെയ്യുകയോ പേസ്റ്റ് ചെയ്യുകയോ ചെയ്യാം..."></textarea>
+      <div class="custom-drawer-actions">
+        <button type="button" class="btn btn-secondary" id="cancelCustomTextBtn">റദ്ദാക്കുക</button>
+        <button type="button" class="btn btn-primary" id="applyCustomTextBtn">ഈ പാഠം ഉപയോഗിക്കുക</button>
+      </div>
+    </section>
+
+    <!-- Live Test Arena Card -->
+    <section class="speedtest-arena-card" aria-label="സ്പീഡ് ടെസ്റ്റ് അരീന">
+
+      <!-- Top HUD Real-time Stats -->
+      <div class="speedtest-hud-bar" role="region" aria-label="തത്സമയ വിവരങ്ങൾ">
+        <div class="speed-hud-card hud-timer">
+          <span class="hud-label">സമയം (Time)</span>
+          <span class="hud-val" id="timerVal">01:00</span>
+          <div class="timer-progress-track">
+            <div class="timer-progress-bar" id="timerProgress"></div>
+          </div>
+        </div>
+
+        <div class="speed-hud-card hud-wpm">
+          <span class="hud-label">വേഗത (WPM)</span>
+          <span class="hud-val" id="liveWpm">0 WPM</span>
+        </div>
+
+        <div class="speed-hud-card hud-acc">
+          <span class="hud-label">കൃത്യത (Accuracy)</span>
+          <span class="hud-val" id="liveAcc">100%</span>
+        </div>
+
+        <div class="speed-hud-card hud-cpm">
+          <span class="hud-label">അക്ഷരങ്ങൾ/മിനിറ്റ്</span>
+          <span class="hud-val" id="liveCpm">0 CPM</span>
+        </div>
+
+        <div class="speed-hud-card hud-errors">
+          <span class="hud-label">തെറ്റുകൾ (Errors)</span>
+          <span class="hud-val" id="liveErrors">0</span>
+        </div>
+      </div>
+
+      <!-- Stream Box -->
+      <div class="stream-header-row">
+        <span class="passage-title-badge" id="passageTitle">📚 കേരളവും പ്രകൃതിയും</span>
+        <small style="color: var(--text-muted); font-size: 0.8rem;">💡 വാക്ക് ടൈപ്പ് ചെയ്ത ശേഷം <strong>Spacebar</strong> അമർത്തുക</small>
+      </div>
+
+      <div class="speedtest-stream-box" id="wordsStream" role="region" aria-label="ടൈപ്പ് ചെയ്യേണ്ട വാക്കുകൾ">
+        <!-- Populated dynamically with spans -->
+      </div>
+
+      <!-- Live Typing Input Field -->
+      <div class="speedtest-input-wrapper">
+        <input
+          type="text"
+          id="testInputField"
+          class="speedtest-input-field"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          placeholder="ഇവിടെ ടൈപ്പ് ചെയ്ത് തുടങ്ങുക (Type here to begin)..."
+          aria-label="ടൈപ്പിംഗ് ഇൻപുട്ട്"
+        />
+      </div>
+
+      <!-- Arena Actions -->
+      <div class="speedtest-actions-bar">
+        <div class="actions-left">
+          <button type="button" class="btn btn-primary" id="startTestBtn">
+            <span>▶️ ടെസ്റ്റ് ആരംഭിക്കുക</span>
+          </button>
+          <button type="button" class="btn btn-secondary" id="restartTestBtn" title="ടെസ്റ്റ് പുനരാരംഭിക്കുക (Esc)">
+            <span>🔄 വീണ്ടും തുടങ്ങുക (Restart)</span>
+          </button>
+          <button type="button" class="btn btn-secondary hidden" id="pauseTestBtn">
+            <span>⏸️ താൽക്കാലികമായി നിർത്തുക</span>
+          </button>
+        </div>
+        <div class="actions-right">
+          <button type="button" class="btn btn-secondary hidden" id="finishEarlyBtn">
+            <span>🏁 പൂർത്തിയാക്കുക (Finish)</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Collapsible Visual Keyboard Assist Drawer -->
+    <section class="keyboard-assist-drawer hidden" id="keyboardDrawer" aria-label="കീബോർഡ് സഹായം">
+      <div class="keyboard-assist-header">
+        <span>⌨️ മലയാളം ഇൻസ്ക്രിപ്റ്റ് ലേഔട്ട് സൂചിക (InScript Visual Reference)</span>
+        <small>ഇംഗ്ലീഷ് കീകളിൽ മലയാളം അക്ഷരങ്ങൾ അടയാളപ്പെടുത്തിയിരിക്കുന്നു</small>
+      </div>
+      <div class="vk-container" id="vkContainer" style="display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem;">
+        <div style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; line-height: 1.8;">
+          <p style="margin: 0 0 6px;"><strong>ഹോം റോ (Home Row):</strong> A: ോ/ഓ | S: േ/ഏ | D: ്/അ | F: ി/ഇ | G: ു/ഉ | H: പ/ഫ | J: ര/റ | K: ക/ഖ | L: ത/ഥ | ;: ച/ഛ | ': ട/ഠ</p>
+          <p style="margin: 0 0 6px;"><strong>ടോപ്പ് റോ (Top Row):</strong> Q: ൗ/ഔ | W: ൈ/ഐ | E: ാ/ആ | R: ീ/ഈ | T: ൂ/ഊ | Y: ബ/ഭ | U: ഹ/ങ | I: ഗ/ഘ | O: ദ/ധ | P: ജ/ഝ | [: ഡ/ഢ | ]: ZWJ/ഞ</p>
+          <p style="margin: 0;"><strong>ബോട്ടം റോ (Bottom Row):</strong> Z: െ/എ | X: ം/ZWNJ | C: മ/ണ | V: ന/ഩ | B: വ/ഴ | N: ല/ള | M: സ/ശ | ,: ,/ഷ | .: ./ഽ | /: യ/?</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personal Best Scores & Test History -->
+    <section class="speedtest-history-card" aria-label="വ്യക്തിഗത റെക്കോർഡുകളും മുൻകാല ചരിത്രവും">
+      <div class="history-card-header">
+        <h3>🏆 നിങ്ങളുടെ മികച്ച സ്കോറുകൾ (Personal Bests)</h3>
+        <button type="button" class="btn btn-secondary" id="clearHistoryBtn" style="font-size: 0.8rem; padding: 4px 10px;">
+          🗑️ ചരിത്രം മായ്ക്കുക
+        </button>
+      </div>
+
+      <!-- Best Scores Grid -->
+      <div class="best-scores-grid">
+        <div class="best-tile">
+          <span class="tile-lbl">1 മിനിറ്റ് റെക്കോർഡ്</span>
+          <span class="tile-val" id="best1m">0 WPM</span>
+        </div>
+        <div class="best-tile">
+          <span class="tile-lbl">2 മിനിറ്റ് റെക്കോർഡ്</span>
+          <span class="tile-val" id="best2m">0 WPM</span>
+        </div>
+        <div class="best-tile">
+          <span class="tile-lbl">3 മിനിറ്റ് റെക്കോർഡ്</span>
+          <span class="tile-val" id="best3m">0 WPM</span>
+        </div>
+        <div class="best-tile">
+          <span class="tile-lbl">5 മിനിറ്റ് റെക്കോർഡ്</span>
+          <span class="tile-val" id="best5m">0 WPM</span>
+        </div>
+      </div>
+
+      <!-- Recent Tests History Table -->
+      <h4 style="margin: 8px 0 2px; font-size: 0.95rem; color: var(--text-muted);">📜 സമീപകാല ടെസ്റ്റുകൾ (Recent Sessions):</h4>
+      <div class="history-table-container">
+        <table class="speed-history-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>തീയതി & സമയം</th>
+              <th>ദൈർഘ്യം</th>
+              <th>വേഗത (Net WPM)</th>
+              <th>കൃത്യത</th>
+              <th>പദവി (Rank)</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Results Modal -->
+  <div class="modal hidden" id="resultsModal" role="dialog" aria-modal="true" aria-labelledby="resultModalTitle">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content speed-results-content">
+      <div class="modal-header" style="justify-content: center; position: relative;">
+        <h3 id="resultModalTitle" style="font-size: 1.25rem;">🎉 സ്പീഡ് ടെസ്റ്റ് പൂർത്തിയായി!</h3>
+        <button type="button" class="btn-icon" id="closeResultsBtn" aria-label="ക്ലോസ് ചെയ്യുക" style="position: absolute; right: 16px;">✕</button>
+      </div>
+
+      <!-- Hero WPM -->
+      <div class="result-hero-box">
+        <span class="hero-wpm-label">നിങ്ങളുടെ ടൈപ്പിംഗ് വേഗത (Net WPM)</span>
+        <div class="hero-wpm-val" id="resultHeroWpm">0 WPM</div>
+        <div class="hero-badge-row">
+          <span id="resultBadge">⚡</span>
+          <span id="resultRank">വേഗതയേറിയ ടൈപ്പിസ്റ്റ്</span>
+        </div>
+        <div class="new-record-pill hidden" id="resultNewRecordBadge">⭐ പുതിയ വ്യക്തിഗത റെക്കോർഡ്! (New Best)</div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="results-stats-grid">
+        <div class="result-stat-tile">
+          <span class="lbl">യഥാർത്ഥ വേഗത (Net)</span>
+          <span class="val" id="statNetWpm">0 WPM</span>
+        </div>
+        <div class="result-stat-tile">
+          <span class="lbl">മൊത്തം വേഗത (Gross)</span>
+          <span class="val" id="statGrossWpm">0 WPM</span>
+        </div>
+        <div class="result-stat-tile">
+          <span class="lbl">കൃത്യത (Accuracy)</span>
+          <span class="val" id="statAccuracy">100%</span>
+        </div>
+        <div class="result-stat-tile">
+          <span class="lbl">ശരിയായ വാക്കുകൾ</span>
+          <span class="val" id="statCorrectWords">0</span>
+        </div>
+        <div class="result-stat-tile">
+          <span class="lbl">തെറ്റിയ വാക്കുകൾ</span>
+          <span class="val" id="statIncorrectWords">0</span>
+        </div>
+        <div class="result-stat-tile">
+          <span class="lbl">അക്ഷരങ്ങൾ (Chars)</span>
+          <span class="val" id="statTotalChars">0</span>
+        </div>
+        <div class="result-stat-tile" style="grid-column: 1 / -1;">
+          <span class="lbl">ടെസ്റ്റ് ദൈർഘ്യം</span>
+          <span class="val" id="statDuration">1 മിനിറ്റ്</span>
+        </div>
+      </div>
+
+      <!-- Mistakes Review Container (shown if there are errors) -->
+      <div class="mistakes-review-box hidden" id="mistakesReviewBox">
+        <div class="mistakes-review-header">
+          <h4 id="mistakesCountHeading" class="mistakes-heading">
+            🔍 തെറ്റുകൾ അവലോകനം (Mistakes Review)
+          </h4>
+          <span class="mistakes-tip">
+            നിങ്ങൾ ടൈപ്പ് ചെയ്തതും ശരിയായ വാക്കും തമ്മിലുള്ള വ്യത്യാസം:
+          </span>
+        </div>
+        <div class="mistakes-list" id="mistakesList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="results-modal-actions">
+        <button type="button" class="btn btn-primary" id="retakeTestBtn">
+          <span>🔄 വീണ്ടും ടെസ്റ്റ് ചെയ്യുക (Retake)</span>
+        </button>
+        <button type="button" class="btn btn-secondary" id="copyScorecardBtn">
+          <span>📋 സ്കോർ കാർഡ് കോപ്പി ചെയ്യുക</span>
+        </button>
+        <button type="button" class="btn btn-secondary" id="shareScorecardBtn">
+          <span>📤 ഷെയർ ചെയ്യുക</span>
+        </button>
+        <a href="tutor.html" class="btn btn-secondary" style="text-decoration: none;">
+          <span>🎓 ട്യൂട്ടറിൽ പരിശീലിക്കുക</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="speed-toast" id="speedToast" role="alert" aria-live="polite"></div>
+
+  <!-- Standalone Speed Test Application Script -->
+  <script src="src/speedtest-app.js"></script>
+</body>
+
+</html>
