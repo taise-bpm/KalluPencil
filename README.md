@@ -66,6 +66,15 @@ A modern, high-performance Malayalam InScript typing web application designed sp
 
 ---
 
+## 🌐 Live Application
+
+* **Official Website:** [https://kallupencil.taise.in/](https://kallupencil.taise.in/)
+* **InScript Tutor:** [https://kallupencil.taise.in/tutor.html](https://kallupencil.taise.in/tutor.html)
+* **Speed Test:** [https://kallupencil.taise.in/speedtest.html](https://kallupencil.taise.in/speedtest.html)
+* **Sitemap:** [https://kallupencil.taise.in/sitemap.xml](https://kallupencil.taise.in/sitemap.xml)
+
+---
+
 ## 🚀 How to Run
 
 ### Option 1: Direct Browser Access (Zero Installation)

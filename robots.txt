@@ -1,0 +1,7 @@
+# Robots.txt for Kallu Pencil (കല്ലുപെൻസിൽ)
+# Live URL: https://kallupencil.taise.in/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://kallupencil.taise.in/sitemap.xml

@@ -196,6 +196,25 @@ import('./src/speed-test.js').then(({ SpeedTestSession, MALAYALAM_SPEED_PASSAGES
       }
       console.log(`✓ bundle.js parity verified across ${ids.size} DOM element IDs.`);
 
+      // 7. Verify SEO, Sitemap & Canonical Tags
+      console.log('Test 7: Verifying Sitemap, Robots.txt & Canonical Tags for Google Search Index...');
+      const sitemapXml = fs.readFileSync('sitemap.xml', 'utf8');
+      assert.ok(sitemapXml.includes('https://kallupencil.taise.in/'), 'sitemap.xml must contain base root URL');
+      assert.ok(sitemapXml.includes('https://kallupencil.taise.in/tutor.html'), 'sitemap.xml must contain tutor.html');
+      assert.ok(sitemapXml.includes('https://kallupencil.taise.in/speedtest.html'), 'sitemap.xml must contain speedtest.html');
+
+      const robotsTxt = fs.readFileSync('robots.txt', 'utf8');
+      assert.ok(robotsTxt.includes('Sitemap: https://kallupencil.taise.in/sitemap.xml'), 'robots.txt must declare sitemap URL');
+      assert.ok(robotsTxt.includes('Allow: /'), 'robots.txt must allow search bots');
+
+      const tutorHtml = fs.readFileSync('tutor.html', 'utf8');
+      const speedtestHtml = fs.readFileSync('speedtest.html', 'utf8');
+
+      assert.ok(htmlCode.includes('<link rel="canonical" href="https://kallupencil.taise.in/" />'), 'index.html must have canonical tag');
+      assert.ok(tutorHtml.includes('<link rel="canonical" href="https://kallupencil.taise.in/tutor.html">'), 'tutor.html must have canonical tag');
+      assert.ok(speedtestHtml.includes('<link rel="canonical" href="https://kallupencil.taise.in/speedtest.html">'), 'speedtest.html must have canonical tag');
+      console.log('✓ Sitemap, robots.txt, and canonical tags verified for https://kallupencil.taise.in/');
+
       console.log('\n=======================================');
       console.log('ALL TESTS PASSED! ENGINE IS 100% SOUND.');
       console.log('=======================================');
